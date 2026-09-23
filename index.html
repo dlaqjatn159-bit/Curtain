@@ -313,7 +313,7 @@
                                 <thead class="sticky top-0 bg-slate-100 text-slate-600 font-bold border-b">
                                     <tr>
                                         <th class="p-2.5">책자 / 품명</th>
-                                        <th class="p-2.5">원단 폭 규격</th>
+                                        <th class="p-2.5">단위 / 규격</th>
                                         <th class="p-2.5">원단원가</th>
                                         <th class="p-2.5">기본가공비</th>
                                         <th class="p-2.5">소비자판매단가</th>
@@ -346,28 +346,28 @@
                 <div class="grid grid-cols-2 gap-3">
                     <div>
                         <label class="block text-xs font-bold text-slate-600 mb-1">원단/제품 코드 ID</label>
-                        <input type="text" id="modalFabId" required placeholder="예: DAM-WIDE-01" class="w-full px-3 py-2 border rounded-xl text-xs font-mono outline-none focus:ring-2 focus:ring-indigo-500">
+                        <input type="text" id="modalFabId" required placeholder="예: DAM-01" class="w-full px-3 py-2 border rounded-xl text-xs font-mono outline-none focus:ring-2 focus:ring-indigo-500">
                     </div>
                     <div>
                         <label class="block text-xs font-bold text-slate-600 mb-1">원단/제품명</label>
-                        <input type="text" id="modalFabName" required placeholder="예: 데미안 B쉬폰, 암막 등" class="w-full px-3 py-2 border rounded-xl text-xs outline-none focus:ring-2 focus:ring-indigo-500">
+                        <input type="text" id="modalFabName" required placeholder="예: 데미안 B쉬폰, 라온암막 등" class="w-full px-3 py-2 border rounded-xl text-xs outline-none focus:ring-2 focus:ring-indigo-500">
                     </div>
                 </div>
                 <div class="grid grid-cols-2 gap-3 bg-indigo-50/60 p-3 rounded-xl border border-indigo-200">
                     <div>
-                        <label class="block text-xs font-bold text-indigo-900 mb-1">⚙️ 기본 단위 구분</label>
+                        <label class="block text-xs font-bold text-indigo-900 mb-1">⚙️ 기본 계산 단위 구분</label>
                         <select id="modalFabCalcType" class="w-full px-3 py-2 border rounded-xl text-xs font-bold text-indigo-900 bg-white outline-none focus:ring-2 focus:ring-indigo-500" onchange="handleCalcTypeChange()">
-                            <option value="yard">야드(마) 원단 (높이 비교 자동 무이음/이음 판별)</option>
-                            <option value="width">폭당 계산 (1폭당 완제품 커튼)</option>
+                            <option value="yard">Y당(마당) 계산 (높이 비교 자동 무이음/이음)</option>
+                            <option value="width">폭당 계산 (폭당 완제품: 폭수 기준)</option>
                             <option value="hebe">헤베(m²)당 계산 (블라인드: 삼보텍스 등)</option>
                         </select>
                     </div>
                     <div>
-                        <label class="block text-xs font-bold text-indigo-900 mb-1">📐 원단 폭 규격 (cm 입력 또는 115" 입력 가능)</label>
+                        <label class="block text-xs font-bold text-indigo-900 mb-1">📐 원단 폭 규격 (cm 또는 115" 입력)</label>
                         <div class="flex items-center gap-2">
-                            <input type="text" id="modalFabSpecCm" placeholder="297cm 또는 117&quot;" class="w-full px-3 py-2 border rounded-xl text-xs font-bold text-indigo-900 bg-white outline-none focus:ring-2 focus:ring-indigo-500" oninput="updateSpecCmPreview()">
+                            <input type="text" id="modalFabSpecCm" placeholder="150cm 또는 297cm" class="w-full px-3 py-2 border rounded-xl text-xs font-bold text-indigo-900 bg-white outline-none focus:ring-2 focus:ring-indigo-500" oninput="updateSpecCmPreview()">
                         </div>
-                        <span id="modalSpecCmPreview" class="text-[10px] text-indigo-600 font-semibold block mt-1">원단 폭 297cm</span>
+                        <span id="modalSpecCmPreview" class="text-[10px] text-indigo-600 font-semibold block mt-1">원단 폭 150cm</span>
                     </div>
                 </div>
                 <div class="grid grid-cols-4 gap-2">
@@ -377,11 +377,11 @@
                     </div>
                     <div>
                         <label class="block text-xs font-bold text-slate-600 mb-1">원단원가(공급가)</label>
-                        <input type="number" id="modalFabCost" required min="0" placeholder="5000" class="w-full px-2.5 py-2 border rounded-xl text-xs outline-none focus:ring-2 focus:ring-indigo-500" oninput="calcModalSellingPrice('cost')">
+                        <input type="number" id="modalFabCost" required min="0" placeholder="23000" class="w-full px-2.5 py-2 border rounded-xl text-xs outline-none focus:ring-2 focus:ring-indigo-500" oninput="calcModalSellingPrice('cost')">
                     </div>
                     <div>
                         <label class="block text-xs font-bold text-slate-600 mb-1" id="modalLaborLabel">기본가공비</label>
-                        <input type="number" id="modalFabLabor" required min="0" placeholder="4500" class="w-full px-2.5 py-2 border rounded-xl text-xs outline-none focus:ring-2 focus:ring-indigo-500" oninput="calcModalSellingPrice('labor')">
+                        <input type="number" id="modalFabLabor" required min="0" placeholder="6500" class="w-full px-2.5 py-2 border rounded-xl text-xs outline-none focus:ring-2 focus:ring-indigo-500" oninput="calcModalSellingPrice('labor')">
                     </div>
                     <div>
                         <label class="block text-xs font-bold text-slate-600 mb-1">마진율 (%)</label>
@@ -394,7 +394,7 @@
                             <label class="block text-xs font-bold text-amber-900">소비자 판매단가 (도매가+마진 포함)</label>
                             <span class="text-[10px] text-amber-700">도매가 = 공급원가 + 가공비</span>
                         </div>
-                        <input type="number" id="modalFabPrice" required min="0" placeholder="14250" class="w-full px-3 py-2 border border-amber-300 rounded-xl text-sm font-black text-indigo-900 bg-white outline-none focus:ring-2 focus:ring-indigo-500" oninput="calcModalSellingPrice('price')">
+                        <input type="number" id="modalFabPrice" required min="0" placeholder="44250" class="w-full px-3 py-2 border border-amber-300 rounded-xl text-sm font-black text-indigo-900 bg-white outline-none focus:ring-2 focus:ring-indigo-500" oninput="calcModalSellingPrice('price')">
                     </div>
                 </div>
                 <div class="pt-3 flex justify-end gap-2">
@@ -525,13 +525,13 @@
         // Google Sheets Published CSV Endpoint
         const GOOGLE_SHEET_CSV_URL = "https://docs.google.com/spreadsheets/d/e/2PACX-1vSuTgDJgwXvk5Xzl5QHLwTNuJf3rHtoGXrCaddxRd17HjBluwVuEwa8_8xXlzeolQ/pub?gid=1550962698&single=true&output=csv";
 
-        // 기본 프리셋 (규격 cm 기준)
+        // 기본 프리셋 (폭당 vs Y당 구분 탑재)
         const DEFAULT_FABRIC_PRESETS = [
-            { book: "데미안", id: "DAM-WIDE-01", name: "데미안 B쉬폰 (대폭 297cm)", calcType: "yard", specCm: 297, unit: "마", cost: 5000, margin: 50, price: 14250, labor: 4500 },
-            { book: "포아", id: "POA-01", name: "차르르 쉬폰 화이트 (대폭 118\"/300cm)", calcType: "yard", specCm: 300, unit: "마", cost: 5000, margin: 50, price: 14250, labor: 4500 },
-            { book: "데미안", id: "DAM-01", name: "데미안 암막 (1Y 소폭 137cm)", calcType: "yard", specCm: 137, unit: "마", cost: 5000, margin: 60, price: 16000, labor: 5000 },
-            { book: "코아", id: "COA-01", name: "도톰 생활암막 베이지 (소폭 60\"/152cm)", calcType: "yard", specCm: 152, unit: "마", cost: 8000, margin: 50, price: 19500, labor: 5000 },
-            { book: "코아", id: "COA-02", name: "코아 암막 (1폭 150cm)", calcType: "width", specCm: 150, unit: "폭", cost: 12000, margin: 50, price: 25500, labor: 5000 },
+            { book: "데미안", id: "DAM-WIDE-01", name: "데미안 B쉬폰 (대폭 297cm Y당)", calcType: "yard", specCm: 297, unit: "마", cost: 5000, margin: 50, price: 14250, labor: 4500 },
+            { book: "데미안", id: "DAM-WIDTH-01", name: "데미안 라온암막 (폭당 23,000원)", calcType: "width", specCm: 150, unit: "폭", cost: 23000, margin: 50, price: 44250, labor: 6500 },
+            { book: "데미안", id: "DAM-YARD-01", name: "데미안 라온암막 (Y당 5,700원)", calcType: "yard", specCm: 150, unit: "마", cost: 5700, margin: 50, price: 14550, labor: 4000 },
+            { book: "포아", id: "POA-01", name: "차르르 쉬폰 화이트 (대폭 118\"/300cm Y당)", calcType: "yard", specCm: 300, unit: "마", cost: 5000, margin: 50, price: 14250, labor: 4500 },
+            { book: "코아", id: "COA-01", name: "도톰 생활암막 베이지 (소폭 60\"/152cm Y당)", calcType: "yard", specCm: 152, unit: "마", cost: 8000, margin: 50, price: 19500, labor: 5000 },
             { book: "삼보텍스", id: "SAM-01", name: "삼보텍스 콤비 블라인드 (헤베당)", calcType: "hebe", specCm: 0, unit: "헤베", cost: 10000, margin: 50, price: 15000, labor: 0 }
         ];
 
@@ -654,10 +654,19 @@
             event.target.value = '';
         }
 
+        // '폭당 23,000원' 또는 'Y당 5,700원', '1폭 23,000원' 등에서 단가 숫자만 정밀 추출
         function cleanNumber(val) {
             if (val === null || val === undefined) return 0;
-            const cleaned = String(val).replace(/,/g, '').replace(/[^0-9.]/g, '');
-            return parseInt(cleaned, 10) || 0;
+            let s = String(val).replace(/,/g, '').trim();
+            s = s.replace(/1\s*(폭|y|Y|마|야드)/g, '');
+            const matches = s.match(/\d+(\.\d+)?/g);
+            if (!matches) return 0;
+            let maxVal = 0;
+            matches.forEach(m => {
+                let num = parseFloat(m);
+                if (num > maxVal) maxVal = num;
+            });
+            return Math.round(maxVal);
         }
 
         // 인치(") 및 cm 수치 자동 파싱 헬퍼 함수
@@ -665,27 +674,74 @@
             const specStr = String(specRaw || "").trim().toLowerCase();
             const nameStr = String(nameRaw || "").trim().toLowerCase();
             
-            const matchNum = specStr.match(/\d+/);
+            const cleaned = specStr.replace(/1\s*(폭|y|마|야드)/g, '');
+            const matchNum = cleaned.match(/\d+/);
             const hasInch = specStr.includes('"') || specStr.includes('인치') || specStr.includes('inch');
             const hasCm = specStr.includes('cm');
 
             if (matchNum) {
                 const val = parseInt(matchNum[0], 10);
-                if (hasInch) {
-                    return Math.round(val * 2.54);
-                } else if (hasCm) {
-                    return val;
-                } else {
-                    // 단위 미표기 시: 80 미만(소폭 인치) 또는 100~140(대폭 인치 110"~126")은 인치로 간주
-                    if (val < 80 || (val >= 100 && val <= 140)) {
+                if (val > 10) {
+                    if (hasInch) {
                         return Math.round(val * 2.54);
+                    } else if (hasCm) {
+                        return val;
+                    } else {
+                        if (val < 80 || (val >= 100 && val <= 140)) {
+                            return Math.round(val * 2.54);
+                        }
+                        return val;
                     }
-                    return val;
                 }
-            } else {
-                if (nameStr.includes('쉬폰') || nameStr.includes('차르르')) return 297;
-                return 150;
             }
+            
+            if (nameStr.includes('쉬폰') || nameStr.includes('차르르')) return 297;
+            return 150;
+        }
+
+        // 단가표의 '기본 단가', '규격', '단위' 등에서 폭당 vs Y당(마당) 지능형 자동 판별
+        function detectCalcTypeAndUnit(costRaw, specRaw, nameRaw, unitRaw, noteRaw, bookRaw, catRaw) {
+            const costStr = String(costRaw || '').trim().toLowerCase();
+            const specStr = String(specRaw || '').trim().toLowerCase();
+            const nameStr = String(nameRaw || '').trim().toLowerCase();
+            const unitStr = String(unitRaw || '').trim().toLowerCase();
+            const noteStr = String(noteRaw || '').trim().toLowerCase();
+            const bookStr = String(bookRaw || '').trim().toLowerCase();
+            const catStr = String(catRaw || '').trim().toLowerCase();
+
+            if (bookStr.includes('삼보텍스') || catStr.includes('블라인드') || nameStr.includes('블라인드') || nameStr.includes('콤비') || specStr.includes('헤베') || specStr.includes('m2') || specStr.includes('m²') || unitStr.includes('헤베')) {
+                return { calcType: 'hebe', unit: '헤베' };
+            }
+
+            const allText = `${costStr} ${specStr} ${nameStr} ${unitStr} ${noteStr} ${catStr}`;
+
+            let isWidth = false;
+            if (unitStr === '폭' || unitStr.startsWith('폭')) {
+                isWidth = true;
+            } else if (allText.includes('폭당') || allText.includes('폭 당') || allText.includes('/폭') || allText.includes('1폭') || allText.includes('폭별')) {
+                isWidth = true;
+            }
+
+            let isYard = false;
+            if (unitStr.includes('마') || unitStr.includes('y') || unitStr.includes('야드') || unitStr.includes('yard')) {
+                isYard = true;
+            } else if (allText.includes('y당') || allText.includes('마당') || allText.includes('야드당') || allText.includes('/y') || allText.includes('/마') || allText.includes('1y') || allText.includes('1 y') || allText.includes('1마') || allText.includes('1야드')) {
+                isYard = true;
+            }
+
+            // 기본 단가 열에 직접 '폭당' 또는 'Y당'이 명시된 경우 최우선 적용
+            if (costStr.includes('폭당') || costStr.includes('/폭') || costStr.includes('1폭') || costStr.includes('폭 당')) {
+                isWidth = true;
+                isYard = false;
+            } else if (costStr.includes('y당') || costStr.includes('마당') || costStr.includes('야드당') || costStr.includes('/y') || costStr.includes('/마') || costStr.includes('1y') || costStr.includes('1 y') || costStr.includes('1마')) {
+                isYard = true;
+                isWidth = false;
+            }
+
+            if (isWidth) {
+                return { calcType: 'width', unit: '폭' };
+            }
+            return { calcType: 'yard', unit: '마' };
         }
 
         function parseSheetDataToFabricDb(dataRows) {
@@ -739,39 +795,21 @@
                 const laborRaw = getCol(['가공비', '봉제비', '수공비', '가공단가', '봉제단가', '수공단가', '가공', '원단가공비', '공임', '공임비', '가공비용', 'labor']);
                 const priceRaw = getCol(['판매단가', '판매가', '소비자가', '소비자단가', '소비자판매가', '소비자판매단가', '판매가격', '소비자가격', 'price']);
                 const unitRaw = getCol(['단위', '계산단위']);
+                const noteRaw = getCol(['비고', '메모', 'note']);
 
                 const fullName = color ? `${name} (${color})` : name;
-                const bookLower = book.toLowerCase();
-                const nameLower = fullName.toLowerCase();
-                const catLower = category.toLowerCase();
-                const unitLower = unitRaw.toLowerCase();
-                const specLower = String(specRaw).toLowerCase();
 
-                let calcType = 'yard';
-                let parsedSpecCm = 150;
-                let unit = '마';
+                // 1. 단가 및 단위 구분 자동 판별 (폭당 vs Y당 vs 헤베)
+                const detected = detectCalcTypeAndUnit(costRaw, specRaw, fullName, unitRaw, noteRaw, book, category);
+                const calcType = detected.calcType;
+                const unit = detected.unit;
 
-                // 블라인드 판단
-                if (bookLower.includes('삼보텍스') || catLower.includes('블라인드') || nameLower.includes('블라인드') || nameLower.includes('콤비') || specLower.includes('헤베') || specLower.includes('m2') || specLower.includes('m²') || unitLower.includes('헤베')) {
-                    calcType = 'hebe';
-                    parsedSpecCm = 0;
-                    unit = '헤베';
-                }
-                // 1폭 완제품 판단
-                else if (specLower.includes('1폭') || specLower.includes('폭당') || nameLower.includes('1폭') || catLower.includes('폭당') || unitLower.includes('폭')) {
-                    calcType = 'width';
-                    unit = '폭';
-                    parsedSpecCm = parseSpecToCm(specRaw, fullName);
-                }
-                // 일반 야드 커튼 원단 (인치 " 포함 자동 cm 환산)
-                else {
-                    calcType = 'yard';
-                    unit = '마';
-                    parsedSpecCm = parseSpecToCm(specRaw, fullName);
-                }
+                // 2. 원단 폭 규격(cm) 파싱
+                const parsedSpecCm = (calcType === 'hebe') ? 0 : parseSpecToCm(specRaw, fullName);
 
+                // 3. 단가 및 공임 추출
                 const cost = cleanNumber(costRaw);
-                let labor = laborRaw !== "" ? cleanNumber(laborRaw) : (calcType === "hebe" ? 0 : 4500);
+                let labor = laborRaw !== "" ? cleanNumber(laborRaw) : (calcType === "hebe" ? 0 : (calcType === "width" ? 6500 : 4500));
                 const baseWholesale = cost + labor;
 
                 let margin = 50;
@@ -814,7 +852,7 @@
         }
 
         function loadFabricDb() {
-            const saved = localStorage.getItem('curtain_fabric_db_v16');
+            const saved = localStorage.getItem('curtain_fabric_db_v17');
             if (saved) {
                 try {
                     FABRIC_DB = JSON.parse(saved);
@@ -830,7 +868,7 @@
         }
 
         function saveFabricDb(triggerRoomsRender = true) {
-            localStorage.setItem('curtain_fabric_db_v16', JSON.stringify(FABRIC_DB));
+            localStorage.setItem('curtain_fabric_db_v17', JSON.stringify(FABRIC_DB));
             updateBookFilterOptions();
             renderDbTable();
             if (triggerRoomsRender) renderRooms();
@@ -863,14 +901,14 @@
                     name: "거실",
                     curtains: [
                         { id: curtainIdCounter++, label: "속지 (쉬폰)", width: 300, height: 232, pleat: "2.0", bookFilter: "ALL", fabricId: "DAM-WIDE-01", installType: "rail", floorGap: 0, hwName: "속지 레일", hwPrice: 1000, shapeFee: 0, leadBand: true },
-                        { id: curtainIdCounter++, label: "겉지 (암막)", width: 300, height: 232, pleat: "2.0", bookFilter: "ALL", fabricId: "COA-01", installType: "rail", floorGap: 0, hwName: "겉지 레일", hwPrice: 1000, shapeFee: 3000, leadBand: false }
+                        { id: curtainIdCounter++, label: "겉지 (암막)", width: 300, height: 232, pleat: "2.0", bookFilter: "ALL", fabricId: "DAM-WIDTH-01", installType: "rail", floorGap: 0, hwName: "겉지 레일", hwPrice: 1000, shapeFee: 3000, leadBand: false }
                     ]
                 },
                 {
                     id: roomIdCounter++,
                     name: "안방",
                     curtains: [
-                        { id: curtainIdCounter++, label: "데미안 암막 (1Y)", width: 280, height: 230, pleat: "2.0", bookFilter: "ALL", fabricId: "DAM-01", installType: "rail", floorGap: 0, hwName: "레일", hwPrice: 1000, shapeFee: 3000, leadBand: false }
+                        { id: curtainIdCounter++, label: "데미안 암막 (Y당)", width: 280, height: 230, pleat: "2.0", bookFilter: "ALL", fabricId: "DAM-YARD-01", installType: "rail", floorGap: 0, hwName: "레일", hwPrice: 1000, shapeFee: 3000, leadBand: false }
                     ]
                 }
             ];
@@ -968,7 +1006,7 @@
                             fabricOptionsHtml += `<optgroup label="📖 ${b}">`;
                             filteredFabrics.filter(f => f.book === b).forEach(f => {
                                 const selected = (f.id === c.fabricId || f.name === c.fabricId) ? "selected" : "";
-                                let badgeDesc = f.calcType === "hebe" ? "헤베" : (f.specCm > 0 ? `${f.specCm}cm` : f.unit);
+                                let badgeDesc = f.calcType === "hebe" ? "헤베" : (f.calcType === "width" ? `폭당(${f.specCm}cm)` : `Y당(${f.specCm}cm)`);
                                 fabricOptionsHtml += `<option value="${f.id}" ${selected}>[${badgeDesc}] ${f.name} - ${(f.price||0).toLocaleString()}원/${f.unit}</option>`;
                             });
                             fabricOptionsHtml += `</optgroup>`;
@@ -982,7 +1020,6 @@
                     }
                     const isBlind = curFab && curFab.calcType === "hebe";
 
-                    // 설치 방식에 따른 차감값 계산 (레일 -3cm, 35파이봉 -10cm, 25파이봉 -9cm)
                     let deduction = 3;
                     if (c.installType === 'rod35') deduction = 10;
                     else if (c.installType === 'rod25') deduction = 9;
@@ -1035,7 +1072,7 @@
                                 </div>
                             </div>
 
-                            <!-- 설치 방식(레일/35파이봉/25파이봉) & 바닥과의 간격 설정 -->
+                            <!-- 설치 기구 (차감) & 바닥 간격 조정 -->
                             <div class="grid grid-cols-2 gap-1.5 sm:gap-2 bg-indigo-50/40 p-2 rounded-lg border border-indigo-100 ${isBlind ? 'hidden' : ''}">
                                 <div class="min-w-0">
                                     <label class="block text-[10px] font-bold text-indigo-950 mb-0.5 flex items-center gap-1 truncate">
@@ -1052,7 +1089,7 @@
                                         <i class="fa-solid fa-arrows-up-down text-indigo-600"></i> 바닥 간격 (끌림/뜸 cm)
                                     </label>
                                     <div class="flex items-center gap-1">
-                                        <input type="number" step="0.5" value="${c.floorGap ?? 0}" placeholder="예: -2 또는 +10" oninput="updateCurtainData(${room.id}, ${c.id}, 'floorGap', parseFloat(this.value)||0)" class="w-full px-2 py-1 border border-indigo-200 rounded-lg text-xs font-black text-indigo-900 bg-white outline-none">
+                                        <input type="number" step="0.5" value="${c.floorGap ?? 0}" placeholder="예: -2 또는 +15" oninput="updateCurtainData(${room.id}, ${c.id}, 'floorGap', parseFloat(this.value)||0)" class="w-full px-2 py-1 border border-indigo-200 rounded-lg text-xs font-black text-indigo-900 bg-white outline-none">
                                         <span class="text-[11px] font-bold text-indigo-700 flex-shrink-0">cm</span>
                                     </div>
                                 </div>
@@ -1071,7 +1108,7 @@
                                     <div class="flex justify-between items-center mb-0.5">
                                         <label class="block text-[10px] font-bold text-slate-500">제품 / 원단 선택</label>
                                         <span class="text-[9px] text-indigo-700 font-extrabold bg-indigo-50 px-1.5 py-0.5 rounded border border-indigo-200 flex-shrink-0">
-                                            ${curFab ? (isBlind ? "블라인드(헤베)" : `원단폭: ${curFab.specCm}cm`) : ""}
+                                            ${curFab ? (isBlind ? "블라인드(헤베)" : (curFab.calcType === "width" ? `폭당(${curFab.specCm}cm)` : `Y당(${curFab.specCm}cm)`)) : ""}
                                         </span>
                                     </div>
                                     <select onchange="updateCurtainData(${room.id}, ${c.id}, 'fabricId', this.value)" class="w-full px-2 py-1 border border-indigo-200 rounded-lg text-xs font-semibold text-indigo-950 bg-white outline-none min-w-0">
@@ -1169,7 +1206,7 @@
             calculateAll();
         }
 
-        // 핵심 견적 연산 함수
+        // 견적 총 계산 함수
         function calculateAll() {
             let grandSubtotal = 0;
             let grandCostTotal = 0;
@@ -1195,7 +1232,7 @@
                     let isSeamless = false;
                     const numJa = Math.ceil((c.width || 0) / 30);
 
-                    // 1) 설치 방식에 따른 차감값 산출 (레일: -3cm, 35파이봉: -10cm, 25파이봉: -9cm)
+                    // 1) 설치 기구별 차감값 산출 (레일: -3cm, 35파이봉: -10cm, 25파이봉: -9cm)
                     let deduction = 3;
                     let installDesc = "레일(-3cm)";
                     if (c.installType === 'rod35') {
@@ -1207,13 +1244,18 @@
                     }
 
                     const floorGapVal = parseFloat(c.floorGap) || 0;
-                    // 실제 커튼 제작 높이 = 실측 세로 - 기구차감 + 바닥간격조정
+                    // 실제 커튼 제작 높이 = 실측 세로 - 기구차감 + 바닥간격(끌림/뜸)
                     const actualCurtainHeight = fab.calcType === "hebe" ? (c.height || 0) : Math.max(0, (c.height || 0) - deduction + floorGapVal);
 
                     // 2) 상하 시접을 더한 필요 원단 높이 (일반: 30cm / 리드밴드: 15cm)
                     const hemAllowance = c.leadBand ? 15 : 30;
                     const requiredFabricHeight = actualCurtainHeight + hemAllowance;
 
+                    const pleatVal = parseFloat(c.pleat) || 2.0;
+                    const totalCurtainWidth = (c.width || 0) * pleatVal;
+                    const fabricSpec = fab.specCm || 150;
+
+                    // A. 블라인드 (헤베 계산)
                     if (fab.calcType === "hebe") {
                         const widthMeters = (c.width || 0) / 100;
                         const heightMeters = (c.height || 0) / 100;
@@ -1227,39 +1269,45 @@
                         const isMinApplied = rawHebe < 2.0;
                         qtyText = `${appliedHebe.toFixed(2)}m² (${appliedHebe}헤베${isMinApplied ? ' [2.0최저]' : ''})`;
                     } 
+                    // B. 폭당 완제품 커튼 (데미안 라온 폭당 주문 등: 폭수 기준)
+                    else if (fab.calcType === "width") {
+                        numWidths = Math.ceil(totalCurtainWidth / fabricSpec) || 1;
+                        totalYards = numWidths;
+                        leadBandCost = c.leadBand ? (Math.ceil((totalCurtainWidth + 30) / 90) * 1000) : 0;
+                        
+                        fabricSellingCost = numWidths * (fab.price || 0);
+                        fabricSupplyCost = numWidths * (fab.cost || 0);
+                        laborCost = numWidths * (fab.labor || 0) + (numWidths * (c.shapeFee || 0));
+                        hwCost = numJa * (c.hwPrice || 0);
+                        qtyText = `${numWidths}폭 (폭당제작·제작H:${actualCurtainHeight}cm)`;
+                    }
+                    // C. 야드(Y/마)당 원단 (높이 비교 자동 무이음/이음)
                     else {
-                        const pleatVal = parseFloat(c.pleat) || 2.0;
-                        const totalCurtainWidth = (c.width || 0) * pleatVal;
-                        const fabricSpec = fab.specCm || 150;
-
                         // [핵심 비교 판별] 원단 사이즈 >= 필요 원단 높이(시접 포함) 이면 무이음!
                         isSeamless = (fabricSpec > 0) && (fabricSpec >= requiredFabricHeight);
 
                         if (isSeamless) {
-                            // 대폭 무이음: 원단 롤을 가로로 풀어 재단 (양쪽 시접 30cm 포함)
+                            // 대폭 무이음: 가로로 롤을 풀어 재단 (양쪽 시접 30cm 포함)
                             const totalRequiredWidth = totalCurtainWidth + 30;
                             totalYards = Math.ceil(totalRequiredWidth / 90) || 1;
-                            // 형상기억 가공비 계산용 폭수 (150cm 기준)
                             numWidths = Math.ceil(totalCurtainWidth / 150) || 1;
                             qtyText = `${totalYards}마 (무이음·제작H:${actualCurtainHeight}cm)`;
                         } else {
-                            // 소폭 이음: 원단 폭으로 쪼개어 이어붙임
+                            // 소폭 이음: 원단 폭으로 쪼개어 세로 연결
                             numWidths = Math.ceil(totalCurtainWidth / fabricSpec) || 1;
                             const yardPerWidth = (actualCurtainHeight + 30) / 90;
                             totalYards = Math.ceil(numWidths * yardPerWidth);
                             qtyText = `${numWidths}폭(${totalYards}마·이음·제작H:${actualCurtainHeight}cm)`;
                         }
 
-                        // 리드밴드 비용: 마당 1,000원 계산
                         leadBandCost = c.leadBand ? (totalYards * 1000) : 0;
-
                         fabricSellingCost = Math.round(totalYards * (fab.price || 0));
                         fabricSupplyCost = Math.round(totalYards * (fab.cost || 0));
                         laborCost = Math.round(totalYards * (fab.labor || 0)) + (numWidths * (c.shapeFee || 0));
                         hwCost = numJa * (c.hwPrice || 0);
                     }
 
-                    // 판매금액 = 원단판매단가 + 형상기억옵션 + 리드밴드옵션 + 부자재
+                    // 판매금액 산출 (원단판매가 + 형상기억옵션 + 리드밴드옵션 + 부자재)
                     const extraShapeFee = fab.calcType === "hebe" ? 0 : (numWidths * (c.shapeFee || 0));
                     const rawCurtainSubtotal = fabricSellingCost + extraShapeFee + leadBandCost + hwCost;
                     const curtainSubtotal = Math.ceil(rawCurtainSubtotal / 1000) * 1000;
@@ -1379,8 +1427,8 @@
 
             filtered.forEach((f) => {
                 const originalIndex = FABRIC_DB.indexOf(f);
-                let badgeDesc = f.calcType === "hebe" ? "헤베" : `${f.specCm}cm`;
-                let badgeColor = f.calcType === "hebe" ? "bg-purple-50 text-purple-800" : (f.specCm >= 200 ? "bg-emerald-100 text-emerald-800" : "bg-blue-50 text-blue-700");
+                let badgeDesc = f.calcType === "hebe" ? "헤베" : (f.calcType === "width" ? `폭당(${f.specCm}cm)` : `Y당(${f.specCm}cm)`);
+                let badgeColor = f.calcType === "hebe" ? "bg-purple-50 text-purple-800" : (f.calcType === "width" ? "bg-blue-50 text-blue-700" : (f.specCm >= 200 ? "bg-emerald-100 text-emerald-800" : "bg-amber-50 text-amber-800"));
                 let calcBadge = `<span class="${badgeColor} px-1.5 py-0.5 rounded font-bold">${badgeDesc}</span>`;
                 let laborText = `${(f.labor||0).toLocaleString()}원/${f.unit||'마'}`;
 
@@ -1430,11 +1478,11 @@
             } else if (calcType === "width") {
                 unitEl.value = "폭";
                 specEl.disabled = false;
-                if (laborLabelEl) laborLabelEl.textContent = "기본가공비 (원/폭)";
+                if (laborLabelEl) laborLabelEl.textContent = "폭당 기본가공비 (원/폭)";
             } else {
                 unitEl.value = "마";
                 specEl.disabled = false;
-                if (laborLabelEl) laborLabelEl.textContent = "기본가공비 (원/마)";
+                if (laborLabelEl) laborLabelEl.textContent = "야드당 기본가공비 (원/마)";
             }
             updateSpecCmPreview();
         }
@@ -1448,7 +1496,11 @@
                 previewEl.textContent = "블라인드 면적 계산 (가로x세로 헤베)";
             } else {
                 const parsedCm = parseSpecToCm(specVal);
-                previewEl.textContent = `환산 원단 폭: 약 ${parsedCm}cm (제작높이+시접과 비교 자동판정)`;
+                if (calcType === "width") {
+                    previewEl.textContent = `폭당 완제품: 1폭 규격 약 ${parsedCm}cm 기준 폭수 산출`;
+                } else {
+                    previewEl.textContent = `환산 원단 폭: 약 ${parsedCm}cm (제작높이+시접 비교 자동 무이음/이음)`;
+                }
             }
         }
 
@@ -1479,7 +1531,7 @@
             document.getElementById('modalFabId').value = "DAM-0" + (FABRIC_DB.length + 1);
             document.getElementById('modalFabName').value = "";
             document.getElementById('modalFabCalcType').value = "yard";
-            document.getElementById('modalFabSpecCm').value = "297";
+            document.getElementById('modalFabSpecCm').value = "150";
             document.getElementById('modalFabUnit').value = "마";
             document.getElementById('modalFabCost').value = "5000";
             document.getElementById('modalFabLabor').value = "4500";
@@ -1584,11 +1636,12 @@
                     if (c.leadBand) optionsList.push("리드밴드");
                     const optionsStr = optionsList.length > 0 ? optionsList.join(', ') : '기본';
                     const gapStr = (calc.floorGapVal > 0 ? `+${calc.floorGapVal}` : calc.floorGapVal) + "cm";
+                    const methodDesc = calc.calcType === 'width' ? '폭당 완제품' : (calc.isSeamless ? '대폭 무이음' : '소폭 이음제작');
 
                     return `   └ ${c.label}\n` +
                            `     • 실측규격: 가로 ${c.width}cm x 세로 ${c.height}cm\n` +
                            `     • 제작규격: 가로 ${c.width}cm x 세로 ${calc.actualCurtainHeight || c.height}cm [${calc.installDesc}, 바닥:${gapStr}]\n` +
-                           `     • 원단/방식: [${calc.fabBook}] ${calc.fabName} (${calc.isSeamless ? '대폭 무이음' : '소폭 이음제작'}, ${c.pleat}배)\n` +
+                           `     • 원단/방식: [${calc.fabBook}] ${calc.fabName} (${methodDesc}, ${c.pleat}배)\n` +
                            `     • 가공옵션: ${optionsStr}\n` +
                            `     • 산출수량: ${calc.qtyText}\n` +
                            `     • 부자재: ${calc.calcType === "hebe" ? "미적용" : (c.hwName + " (" + calc.numJa + "자)")}\n` +
@@ -1601,7 +1654,7 @@
 
             setTimeout(() => {
                 if (type === 'factory') {
-                    if (helpText) helpText.innerHTML = `🏭 <strong>공장 발주서</strong>: 실측과 레일/봉 및 바닥간격이 반영된 최종 제작 규격이 정리되었습니다.`;
+                    if (helpText) helpText.innerHTML = `🏭 <strong>공장 발주서</strong>: 실측과 기구차감 및 바닥간격이 반영된 최종 완제품 치수, 폭당/무이음 구분이 정리되었습니다.`;
                     textarea.value = `[공장 통합 발주서]\n• 발주일자: ${dateStr}\n• 현장/고객명: ${custName} 님\n----------------------------------------\n\n${roomSummaries}\n\n----------------------------------------\n※ 모든 커튼 세로 제작 치수는 기구 차감 및 바닥 간격 조정이 반영된 최종 완제품 치수임. 수량 및 시접(일반30cm/리드밴드15cm) 확인 요망.`;
                 } else if (type === 'kakao') {
                     if (helpText) helpText.innerHTML = `💬 <strong>카톡 견적 안내문</strong>: 복사 후 카카오톡으로 바로 전송하실 수 있습니다.`;
@@ -1629,13 +1682,13 @@
                             const fab = FABRIC_DB.find(f => f.id === c.fabricId) || {};
                             const qtyVal = calc.calcType === 'hebe' ? calc.appliedHebe : (calc.calcType === 'width' ? calc.numWidths : calc.totalYards);
                             const optText = `${c.shapeFee > 0 ? '형상 ' : ''}${c.leadBand ? '리드밴드' : ''}`.trim() || '기본';
+                            const methodDesc = calc.calcType === 'hebe' ? '블라인드' : (calc.calcType === 'width' ? '폭당완제품' : (calc.isSeamless ? '대폭무이음' : '소폭이음'));
 
                             rows.push([
                                 dateStr, custName, r.name, c.label, calc.fabBook || "", calc.fabName || "",
                                 c.width, c.height, calc.installDesc || "레일", `${calc.floorGapVal || 0}cm`,
                                 calc.actualCurtainHeight || c.height,
-                                calc.calcType === 'hebe' ? '블라인드' : (calc.isSeamless ? '대폭무이음' : '소폭이음'),
-                                optText, qtyVal, fab.unit || "", fab.price || 0,
+                                methodDesc, optText, qtyVal, fab.unit || "", fab.price || 0,
                                 calc.calcType === 'hebe' ? '미적용' : `${c.hwName} (${calc.numJa}자)`,
                                 calc.curtainSubtotal || 0
                             ].join('\t'));
@@ -1697,13 +1750,13 @@
                     const fab = FABRIC_DB.find(f => f.id === c.fabricId) || {};
                     const qtyVal = calc.calcType === 'hebe' ? calc.appliedHebe : (calc.calcType === 'width' ? calc.numWidths : calc.totalYards);
                     const optText = `${c.shapeFee > 0 ? '형상 ' : ''}${c.leadBand ? '리드밴드' : ''}`.trim() || '기본';
+                    const methodDesc = calc.calcType === 'hebe' ? '블라인드' : (calc.calcType === 'width' ? '폭당완제품' : (calc.isSeamless ? '대폭무이음' : '소폭이음'));
 
                     const row = [
                         dateStr, custName, r.name, c.label, calc.fabBook || "", calc.fabName || "",
                         c.width, c.height, calc.installDesc || "레일", `${calc.floorGapVal || 0}cm`,
                         calc.actualCurtainHeight || c.height,
-                        calc.calcType === 'hebe' ? '블라인드' : (calc.isSeamless ? '대폭무이음' : '소폭이음'),
-                        optText, qtyVal, fab.unit || "", fab.price || 0,
+                        methodDesc, optText, qtyVal, fab.unit || "", fab.price || 0,
                         calc.calcType === 'hebe' ? '미적용' : `${c.hwName} (${calc.numJa}자)`,
                         calc.curtainSubtotal || 0
                     ];
