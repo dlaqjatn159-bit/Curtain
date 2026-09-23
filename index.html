@@ -31,7 +31,6 @@
         .custom-scrollbar::-webkit-scrollbar-thumb { background: #cbd5e1; border-radius: 8px; }
         .custom-scrollbar::-webkit-scrollbar-thumb:hover { background: #94a3b8; }
 
-        /* Ticket Card Aesthetic Background & Shadows */
         .linen-bg {
             background-color: #d6ccbe;
             background-image: 
@@ -44,14 +43,12 @@
             mix-blend-mode: multiply;
         }
 
-        /* Prevent Korean descender text clipping during html2canvas render */
         .ticket-item-row {
             line-height: 1.6 !important;
             padding-top: 6px !important;
             padding-bottom: 7px !important;
         }
 
-        /* Mobile Touch & Viewport Optimizations (Prevent Horizontal Overflow) */
         html, body {
             width: 100%;
             max-width: 100vw;
@@ -61,13 +58,11 @@
         }
 
         @media (max-width: 640px) {
-            /* Prevent jarring zoom on iOS when tapping inputs */
             input[type="text"], input[type="number"], select, textarea {
                 font-size: 14px !important;
             }
         }
 
-        /* Perfectly Integrated Ticket Notches that stick directly to the dashed line */
         .ticket-cutout-notch {
             width: 26px;
             height: 26px;
@@ -76,7 +71,6 @@
             box-shadow: inset 0 2px 4px rgba(60, 45, 30, 0.25);
         }
 
-        /* Print Mode Styling */
         @media print {
             body * { visibility: hidden !important; }
             #ticketCaptureArea, #ticketCaptureArea * { visibility: visible !important; }
@@ -100,19 +94,22 @@
         <header class="bg-white rounded-2xl p-4 sm:p-5 md:p-6 shadow-sm border border-slate-200 flex flex-col md:flex-row justify-between items-start md:items-center gap-4">
             <div>
                 <div class="flex items-center gap-2 text-indigo-600 font-bold text-xs md:text-sm tracking-wide uppercase mb-1">
-                    <i class="fa-solid fa-file-csv"></i> 실무 판매가 기준 견적 계산기
-                    <span id="dbLoadedBadge" class="bg-blue-100 text-blue-800 text-[10px] px-2 py-0.5 rounded-full font-extrabold border border-blue-200">
-                        CSV 파일 로드 지원
+                    <i class="fa-solid fa-table"></i> 실무 판매가 기준 견적 계산기
+                    <span id="dbLoadedBadge" class="bg-emerald-100 text-emerald-800 text-[10px] px-2.5 py-0.5 rounded-full font-extrabold border border-emerald-300 flex items-center gap-1">
+                        <i class="fa-solid fa-cloud-arrow-down"></i> 구글 시트 연동 준비
                     </span>
                 </div>
                 <h1 class="text-xl sm:text-2xl font-black text-slate-900 tracking-tight">커튼 & 블라인드 맞춤 견적 시스템</h1>
             </div>
             <div class="grid grid-cols-2 sm:flex sm:flex-wrap items-center gap-2 w-full sm:w-auto">
-                <button id="btnInstallApp" onclick="triggerAppInstall()" class="hidden bg-emerald-600 hover:bg-emerald-700 text-white font-bold px-3 py-2 sm:px-3.5 sm:py-2.5 rounded-xl text-xs transition flex items-center justify-center gap-1.5 shadow-sm whitespace-nowrap animate-pulse">
-                    <i class="fa-solid fa-mobile-screen-button text-emerald-200"></i> 📱 앱 설치
+                <button onclick="fetchGoogleSheetDb(false)" class="bg-emerald-600 hover:bg-emerald-700 text-white font-bold px-3 py-2 sm:px-3.5 sm:py-2.5 rounded-xl text-xs transition flex items-center justify-center gap-1.5 shadow-sm whitespace-nowrap active:scale-95">
+                    <i class="fa-solid fa-arrows-rotate"></i> 🔄 시트 동기화
                 </button>
-                <label class="bg-blue-600 hover:bg-blue-700 text-white font-bold px-3 py-2 sm:px-4 sm:py-2.5 rounded-xl text-xs transition flex items-center justify-center gap-1.5 shadow-sm cursor-pointer whitespace-nowrap">
-                    <i class="fa-solid fa-file-csv text-sm"></i> CSV 업로드
+                <button id="btnInstallApp" onclick="triggerAppInstall()" class="hidden bg-indigo-600 hover:bg-indigo-700 text-white font-bold px-3 py-2 sm:px-3.5 sm:py-2.5 rounded-xl text-xs transition flex items-center justify-center gap-1.5 shadow-sm whitespace-nowrap animate-pulse">
+                    <i class="fa-solid fa-mobile-screen-button text-indigo-200"></i> 📱 앱 설치
+                </button>
+                <label class="bg-slate-700 hover:bg-slate-800 text-white font-bold px-3 py-2 sm:px-3.5 sm:py-2.5 rounded-xl text-xs transition flex items-center justify-center gap-1.5 shadow-sm cursor-pointer whitespace-nowrap">
+                    <i class="fa-solid fa-file-csv"></i> 수동 CSV
                     <input type="file" id="csvFileInput" accept=".csv" class="hidden" onchange="handleCsvFileUpload(event)">
                 </label>
                 <button onclick="openTicketModal()" class="bg-gradient-to-r from-amber-700 to-stone-800 hover:from-amber-800 hover:to-stone-900 text-amber-100 font-bold px-3 py-2 sm:px-3.5 sm:py-2.5 rounded-xl text-xs transition flex items-center justify-center gap-1.5 shadow-sm border border-amber-600/30 whitespace-nowrap">
@@ -157,9 +154,7 @@
         <div class="grid grid-cols-1 lg:grid-cols-12 gap-5 sm:gap-6 w-full min-w-0">
 
             <!-- Left Panel: Rooms & Curtains/Blinds Inputs -->
-            <div class="lg:col-span-7 space-y-5 sm:space-y-6 w-full min-w-0" id="roomsContainer">
-                <!-- Room Cards injected dynamically -->
-            </div>
+            <div class="lg:col-span-7 space-y-5 sm:space-y-6 w-full min-w-0" id="roomsContainer"></div>
 
             <!-- Right Panel: Overall Summary & Document Generator -->
             <div class="lg:col-span-5 space-y-5 sm:space-y-6 w-full min-w-0">
@@ -175,12 +170,8 @@
                             <span id="badgeVat" class="bg-emerald-500/20 text-emerald-300 text-xs px-2.5 py-1 rounded-full border border-emerald-400/30 font-bold">일반 소비자 판매가</span>
                         </div>
                         
-                        <!-- Room Breakdowns Summary List -->
-                        <div class="space-y-1.5 text-xs" id="summaryRoomList">
-                            <!-- Dynamic Room Subtotal Lines -->
-                        </div>
+                        <div class="space-y-1.5 text-xs" id="summaryRoomList"></div>
 
-                        <!-- Subtotals & Additional Fees Breakdown -->
                         <div class="pt-3 border-t border-indigo-800/60 space-y-2 text-xs font-mono">
                             <div class="flex justify-between text-indigo-200">
                                 <span>공간별 제품 합산:</span>
@@ -200,7 +191,7 @@
                             </div>
                         </div>
 
-                        <!-- Business Profit Breakdown Panel (Toggleable) -->
+                        <!-- Business Profit Breakdown Panel -->
                         <div id="profitPanel" class="hidden bg-slate-900/95 rounded-xl p-4 border border-amber-500/40 space-y-2 text-xs backdrop-blur-sm">
                             <div class="text-amber-400 font-bold flex justify-between items-center border-b border-slate-700 pb-1.5">
                                 <span class="flex items-center gap-1.5"><i class="fa-solid fa-coins"></i> 실무 순이익 분석 (판매가 기준)</span>
@@ -216,7 +207,7 @@
                             </div>
                         </div>
 
-                        <!-- Final Grand Total Display (At the Very Bottom) -->
+                        <!-- Final Grand Total Display -->
                         <div class="bg-gradient-to-r from-emerald-950/70 to-slate-900/90 rounded-xl p-4 border border-emerald-500/40 shadow-inner mt-3">
                             <div class="flex justify-between items-center mb-1">
                                 <p class="text-xs text-emerald-300 font-bold">전체 공간 합산 최종 견적금액</p>
@@ -245,7 +236,6 @@
                         </button>
                     </div>
 
-                    <!-- Generation Action Buttons -->
                     <div class="grid grid-cols-2 sm:grid-cols-5 gap-2">
                         <button onclick="openTicketModal()" class="col-span-2 sm:col-span-1 bg-gradient-to-r from-amber-50 to-stone-100 hover:from-amber-100 hover:to-stone-200 text-stone-800 font-bold py-2 px-2.5 rounded-xl text-xs transition flex items-center justify-center gap-1.5 border border-amber-300 shadow-sm">
                             <i class="fa-solid fa-camera-retro text-amber-700"></i> 카드 견적서
@@ -265,10 +255,6 @@
                     </div>
 
                     <div class="p-2 bg-slate-50 rounded-xl border border-slate-200 text-[11px] text-slate-600 flex items-center justify-between">
-                        <span id="docHelpText">💡 <strong>카드 견적서</strong>를 누르면 인스타/카톡 전송용 감성 티켓 이미지로 즉시 저장 및 인쇄가 가능합니다.</span>
-                    </div>
-
-                    <div class="p-2 bg-slate-50 rounded-xl border border-slate-200 text-[11px] text-slate-600 flex items-center justify-between">
                         <span id="docHelpText">💡 <strong>시트 상세(표)</strong> 또는 <strong>고객대장(1행)</strong> 생성 후 복사하여 엑셀/구글 시트에 Ctrl+V 하시면 표로 들어갑니다.</span>
                     </div>
 
@@ -280,9 +266,8 @@
                     </div>
                 </div>
 
-                <!-- Fabric & Blind DB List Section (Collapsible Accordion) -->
+                <!-- Fabric & Blind DB List Section -->
                 <div id="dbSectionCard" class="bg-white rounded-2xl p-4 sm:p-5 shadow-sm border border-slate-200 transition-all">
-                    <!-- Collapsible Header Banner -->
                     <div class="flex items-center justify-between cursor-pointer select-none gap-2" onclick="toggleDbSection()">
                         <div class="flex items-center gap-2.5 min-w-0">
                             <div class="w-8 h-8 rounded-xl bg-indigo-50 text-indigo-600 flex items-center justify-center text-sm font-bold shadow-inner flex-shrink-0">
@@ -297,10 +282,12 @@
                             </div>
                         </div>
 
-                        <!-- Action & Toggle Buttons -->
                         <div class="flex items-center gap-1.5 flex-shrink-0" onclick="event.stopPropagation()">
+                            <button onclick="fetchGoogleSheetDb(false)" class="bg-emerald-600 hover:bg-emerald-700 text-white font-bold px-2.5 py-1.5 rounded-xl text-xs transition flex items-center gap-1 shadow-sm whitespace-nowrap">
+                                <i class="fa-solid fa-arrows-rotate text-[10px]"></i> 새로고침
+                            </button>
                             <button onclick="openFabricModal()" class="bg-indigo-600 hover:bg-indigo-700 text-white font-bold px-2.5 py-1.5 rounded-xl text-xs transition flex items-center gap-1 shadow-sm whitespace-nowrap">
-                                <i class="fa-solid fa-plus text-[10px]"></i> <span class="hidden sm:inline">직접</span> 추가
+                                <i class="fa-solid fa-plus text-[10px]"></i> 추가
                             </button>
                             <button onclick="toggleDbSection()" class="bg-slate-100 hover:bg-slate-200 text-slate-700 font-bold px-2.5 py-1.5 rounded-xl text-xs transition flex items-center gap-1.5 border border-slate-200 whitespace-nowrap">
                                 <span id="dbAccordionStatus" class="font-semibold text-slate-700">펼치기</span>
@@ -309,9 +296,7 @@
                         </div>
                     </div>
 
-                    <!-- Collapsible Body Content (Default Hidden / Collapsed) -->
                     <div id="dbCollapsibleContent" class="hidden mt-4 pt-4 border-t border-slate-100 space-y-3 sm:space-y-4">
-                        <!-- Filter Controls for DB Table -->
                         <div class="grid grid-cols-1 sm:grid-cols-2 gap-2">
                             <div>
                                 <select id="dbBookFilter" class="w-full px-2.5 py-1.5 border rounded-xl text-xs font-semibold bg-slate-50 outline-none" onchange="renderDbTable()">
@@ -323,7 +308,6 @@
                             </div>
                         </div>
 
-                        <!-- Fabric Table -->
                         <div class="overflow-x-auto max-h-64 overflow-y-auto custom-scrollbar border rounded-xl border-slate-100">
                             <table class="w-full text-left text-xs border-collapse">
                                 <thead class="sticky top-0 bg-slate-100 text-slate-600 font-bold border-b">
@@ -336,35 +320,29 @@
                                         <th class="p-2.5 text-center">관리</th>
                                     </tr>
                                 </thead>
-                                <tbody id="dbTableBody" class="divide-y divide-slate-100">
-                                    <!-- Dynamic Fabric Rows -->
-                                </tbody>
+                                <tbody id="dbTableBody" class="divide-y divide-slate-100"></tbody>
                             </table>
                         </div>
                     </div>
                 </div>
 
             </div>
-
         </div>
     </div>
 
-    <!-- Fabric/Blind Add/Edit Modal -->
+    <!-- Fabric Modal -->
     <div id="fabricModal" class="fixed inset-0 bg-slate-900/50 backdrop-blur-sm z-50 flex items-center justify-center hidden p-4">
         <div class="bg-white rounded-2xl max-w-lg w-full p-6 shadow-2xl space-y-4">
             <div class="flex justify-between items-center border-b pb-3">
                 <h3 class="font-bold text-base text-slate-800" id="modalTitle">원단/블라인드 단가 설정</h3>
                 <button onclick="closeFabricModal()" class="text-slate-400 hover:text-slate-600 text-lg font-bold">✕</button>
             </div>
-
             <form id="fabricForm" onsubmit="handleFabricSubmit(event)" class="space-y-3">
                 <input type="hidden" id="modalFabIndex" value="-1">
-
                 <div>
                     <label class="block text-xs font-bold text-slate-600 mb-1">원단 책자 / 샘플북 이름</label>
                     <input type="text" id="modalFabBook" required placeholder="예: 코아, 포아, 데미안, 삼보텍스" class="w-full px-3 py-2 border rounded-xl text-xs outline-none focus:ring-2 focus:ring-indigo-500">
                 </div>
-
                 <div class="grid grid-cols-2 gap-3">
                     <div>
                         <label class="block text-xs font-bold text-slate-600 mb-1">원단/제품 코드 ID</label>
@@ -375,7 +353,6 @@
                         <input type="text" id="modalFabName" required placeholder="예: 데미안 암막, 삼보텍스 콤비" class="w-full px-3 py-2 border rounded-xl text-xs outline-none focus:ring-2 focus:ring-indigo-500">
                     </div>
                 </div>
-
                 <div class="grid grid-cols-2 gap-3 bg-indigo-50/60 p-3 rounded-xl border border-indigo-200">
                     <div>
                         <label class="block text-xs font-bold text-indigo-900 mb-1">⚙️ 계산 방식 (구분)</label>
@@ -394,7 +371,6 @@
                         <span id="modalInchCmPreview" class="text-[10px] text-indigo-600 font-semibold block mt-1">약 150 cm</span>
                     </div>
                 </div>
-
                 <div class="grid grid-cols-3 gap-3">
                     <div>
                         <label class="block text-xs font-bold text-slate-600 mb-1">표기 단위</label>
@@ -409,7 +385,6 @@
                         <input type="number" id="modalFabMargin" required min="0" step="1" placeholder="50" class="w-full px-3 py-2 border rounded-xl text-xs font-bold text-amber-700 outline-none focus:ring-2 focus:ring-indigo-500" oninput="calcModalSellingPrice('margin')">
                     </div>
                 </div>
-
                 <div class="grid grid-cols-2 gap-3">
                     <div class="bg-amber-50/70 p-3 rounded-xl border border-amber-200">
                         <label class="block text-xs font-bold text-amber-900 mb-1">소비자 판매단가 (원)</label>
@@ -420,7 +395,6 @@
                         <input type="number" id="modalFabLabor" required min="0" placeholder="5000" class="w-full px-3 py-1.5 border rounded-xl text-xs outline-none focus:ring-2 focus:ring-indigo-500">
                     </div>
                 </div>
-
                 <div class="pt-3 flex justify-end gap-2">
                     <button type="button" onclick="closeFabricModal()" class="px-4 py-2 border rounded-xl text-xs font-semibold text-slate-600 hover:bg-slate-100">취소</button>
                     <button type="submit" class="px-4 py-2 bg-indigo-600 hover:bg-indigo-700 text-white rounded-xl text-xs font-bold shadow-sm">저장하기</button>
@@ -429,7 +403,7 @@
         </div>
     </div>
 
-    <!-- Custom Modal Confirm Dialog -->
+    <!-- Confirm Modal -->
     <div id="confirmModal" class="fixed inset-0 bg-slate-900/60 backdrop-blur-sm z-50 flex items-center justify-center hidden p-4">
         <div class="bg-white rounded-2xl max-w-sm w-full p-6 shadow-2xl space-y-4 text-center">
             <div class="w-12 h-12 bg-rose-100 text-rose-600 rounded-full flex items-center justify-center mx-auto text-xl font-bold">
@@ -444,40 +418,9 @@
         </div>
     </div>
 
-    <!-- App Install Guide Modal for Galaxy Devices -->
-    <div id="installGuideModal" class="fixed inset-0 bg-slate-950/75 backdrop-blur-md z-[70] flex items-center justify-center hidden p-4">
-        <div class="bg-white rounded-3xl max-w-sm w-full p-6 shadow-2xl space-y-4 border border-slate-200">
-            <div class="text-center space-y-2">
-                <div class="w-14 h-14 bg-indigo-50 text-indigo-600 rounded-2xl flex items-center justify-center mx-auto text-2xl shadow-inner border border-indigo-100">
-                    <i class="fa-solid fa-mobile-screen-button"></i>
-                </div>
-                <h3 class="text-base font-black text-slate-900">갤럭시 기기에 앱으로 설치</h3>
-                <p class="text-xs text-slate-500 leading-relaxed">
-                    갤럭시 탭 S10 울트라 및 갤럭시 S25 엣지의 홈 화면에 정식 앱으로 추가하여 주소창 없이 풀스크린으로 사용하세요!
-                </p>
-            </div>
-
-            <div class="bg-slate-50 p-3.5 rounded-2xl border border-slate-200 space-y-2.5 text-xs text-slate-700">
-                <div class="flex items-start gap-2">
-                    <span class="w-5 h-5 rounded-full bg-indigo-600 text-white text-[10px] flex items-center justify-center font-bold flex-shrink-0 mt-0.5">1</span>
-                    <span><strong>삼성 인터넷 사용 시:</strong> 우측 하단 <strong>≡ (메뉴)</strong> ➔ <strong>[현재 페이지 추가]</strong> ➔ <strong>[홈 화면]</strong> 터치</span>
-                </div>
-                <div class="flex items-start gap-2">
-                    <span class="w-5 h-5 rounded-full bg-indigo-600 text-white text-[10px] flex items-center justify-center font-bold flex-shrink-0 mt-0.5">2</span>
-                    <span><strong>크롬(Chrome) 사용 시:</strong> 우측 상단 <strong>⋮ (메뉴)</strong> ➔ <strong>[앱 설치]</strong> 또는 <strong>[홈 화면에 추가]</strong> 터치</span>
-                </div>
-            </div>
-
-            <button onclick="closeInstallGuideModal()" class="w-full bg-indigo-600 hover:bg-indigo-700 text-white font-bold py-2.5 rounded-xl text-xs shadow-sm transition">
-                확인했습니다
-            </button>
-        </div>
-    </div>
-
-    <!-- Aesthetic Ticket Quote Modal -->
+    <!-- Ticket Modal -->
     <div id="ticketModal" class="fixed inset-0 bg-stone-950/75 backdrop-blur-md z-50 flex items-center justify-center hidden p-3 sm:p-6 overflow-y-auto">
         <div class="bg-white/95 rounded-3xl max-w-md w-full p-5 sm:p-6 shadow-2xl space-y-4 relative my-auto border border-stone-200">
-            <!-- Modal Header -->
             <div class="flex justify-between items-center border-b pb-3">
                 <div>
                     <h3 class="font-bold text-stone-900 text-sm sm:text-base flex items-center gap-2">
@@ -488,69 +431,49 @@
                 <button onclick="closeTicketModal()" class="w-8 h-8 rounded-full bg-stone-100 hover:bg-stone-200 text-stone-600 font-bold flex items-center justify-center transition">✕</button>
             </div>
 
-            <!-- Preview Card Area (This whole block is captured as high-res PNG) -->
             <div class="flex justify-center items-center py-2">
                 <div id="ticketCaptureArea" class="linen-bg p-4 sm:p-7 rounded-[28px] sm:rounded-[32px] shadow-xl relative overflow-hidden w-full max-w-[340px] sm:max-w-[370px] min-h-[540px] sm:min-h-[580px] flex flex-col justify-center items-center border border-stone-300/60">
-                    <!-- Dappled Foliage Shadow Overlay -->
                     <div class="absolute inset-0 leaf-shadow-overlay pointer-events-none z-0"></div>
                     <div class="absolute -top-12 -right-12 w-48 h-48 rounded-full bg-amber-900/10 blur-2xl pointer-events-none"></div>
 
-                    <!-- Pure Aesthetic White Ticket -->
                     <div class="relative z-10 w-full bg-[#fdfcf9] rounded-[22px] sm:rounded-[26px] shadow-[0_22px_45px_-12px_rgba(70,50,30,0.35)] p-4 sm:p-6 flex flex-col justify-between border border-stone-200/90 text-stone-800 font-serif-kr overflow-hidden">
-
-                        <!-- Top Title & Customer Name -->
                         <div class="text-center pt-1 sm:pt-2 space-y-1">
                             <h2 class="text-xl sm:text-2xl font-bold tracking-tight text-stone-900">맞춤 제작 견적서</h2>
                             <p class="text-xs sm:text-sm text-stone-600 font-medium" id="ticketCustomerName">홍길동 고객님</p>
                         </div>
 
-                        <!-- Re.dam Architectural Louver Emblem Logo -->
                         <div class="flex justify-center my-2 sm:my-3">
                             <div class="w-16 h-auto sm:w-22 flex items-center justify-center select-none drop-shadow-sm">
                                 <svg viewBox="0 0 200 175" class="w-full h-full" fill="none" xmlns="http://www.w3.org/2000/svg">
-                                    <!-- Slat 1: Left rounded curve -->
                                     <path d="M42 56 C42 42 48 37 54 35 L54 120 L42 120 Z" fill="#B64825"/>
-                                    <!-- Slat 2 -->
                                     <polygon points="58,33 70,28 70,120 58,120" fill="#B64825"/>
-                                    <!-- Slat 3 -->
                                     <polygon points="74,26 86,21 86,120 74,120" fill="#B64825"/>
-                                    <!-- Slat 4 -->
                                     <polygon points="90,19 102,14 102,120 90,120" fill="#B64825"/>
-                                    <!-- Triangular Shadow / Wall Plane -->
                                     <polygon points="106,70 178,120 106,120" fill="#6C5D53"/>
-                                    <!-- Re.dam Wordmark Typography -->
                                     <text x="96" y="158" text-anchor="middle" fill="#B64825" font-family="'Pretendard', sans-serif" font-weight="700" font-size="33" letter-spacing="-0.5">Re.dam</text>
-                                    <!-- Subtle Sparkle Star at bottom right -->
                                     <path d="M175 145 Q175 152 182 152 Q175 152 175 159 Q175 152 168 152 Q175 152 175 145 Z" fill="#B64825" opacity="0.35"/>
                                 </svg>
                             </div>
                         </div>
 
-                        <!-- Middle Quotation List Items -->
-                        <div class="space-y-1 my-1 text-stone-700 font-normal px-0.5" id="ticketItemsList">
-                            <!-- Dynamic Room Lines -->
-                        </div>
+                        <div class="space-y-1 my-1 text-stone-700 font-normal px-0.5" id="ticketItemsList"></div>
 
-                        <!-- Dashed Perforated Line with Perfectly Aligned Notches (Never Misaligns on Mobile) -->
                         <div class="relative my-2 sm:my-3 flex items-center justify-between -mx-4 sm:-mx-6">
                             <div class="ticket-cutout-notch -ml-3.5"></div>
                             <div class="w-full border-b border-dashed border-stone-300 mx-2"></div>
                             <div class="ticket-cutout-notch -mr-3.5"></div>
                         </div>
 
-                        <!-- Bottom Final Total Price -->
                         <div class="text-center pt-1 pb-1">
                             <p class="text-xs sm:text-[13.5px] font-bold text-stone-900 tracking-tight leading-normal">
-                                최종 견적 합계 : <span id="ticketGrandTotal" class="font-extrabold text-stone-950">950,000</span>원
+                                최종 견적 합계 : <span id="ticketGrandTotal" class="font-extrabold text-stone-950">0</span>원
                             </p>
                             <p class="text-[9.5px] text-stone-400 mt-1 font-sans" id="ticketDateText">2026.09.22 기준</p>
                         </div>
-
                     </div>
                 </div>
             </div>
 
-            <!-- Modal Action Buttons -->
             <div class="grid grid-cols-2 gap-2.5 pt-1">
                 <button onclick="downloadTicketImage()" class="w-full bg-stone-900 hover:bg-stone-800 text-amber-100 font-bold py-2.5 px-3 rounded-xl text-xs transition flex items-center justify-center gap-1.5 shadow-sm">
                     <i class="fa-solid fa-share-nodes text-amber-400"></i> 이미지 저장 / 공유
@@ -562,7 +485,7 @@
         </div>
     </div>
 
-    <!-- Mobile Image Viewer / Save Modal -->
+    <!-- Mobile Image Viewer Modal -->
     <div id="mobileImageModal" class="fixed inset-0 bg-stone-950/90 backdrop-blur-md z-[60] flex flex-col items-center justify-center hidden p-4">
         <div class="w-full max-w-sm flex flex-col items-center space-y-3">
             <div class="w-full flex justify-between items-center text-white px-1">
@@ -590,75 +513,22 @@
         </div>
     </div>
 
-    <!-- Toast Notification Popup -->
+    <!-- Toast Notification -->
     <div id="toast" class="fixed bottom-6 right-6 bg-slate-900 text-white px-4 py-2.5 rounded-xl shadow-lg text-xs font-bold hidden transition-all z-50 flex items-center gap-2 border border-slate-700">
         <i class="fa-solid fa-circle-check text-emerald-400" id="toastIcon"></i>
         <span id="toastMsg">처리되었습니다.</span>
     </div>
 
     <script>
-        // Default Fabric Presets (Curtains & Blinds)
+        // Google Sheets Published CSV Endpoint
+        const GOOGLE_SHEET_CSV_URL = "https://docs.google.com/spreadsheets/d/e/2PACX-1vSuTgDJgwXvk5Xzl5QHLwTNuJf3rHtoGXrCaddxRd17HjBluwVuEwa8_8xXlzeolQ/pub?gid=1550962698&single=true&output=csv";
+
         const DEFAULT_FABRIC_PRESETS = [
-            {
-                book: "포아",
-                id: "POA-01",
-                name: "차르르 쉬폰 화이트 (59\" 인치)",
-                calcType: "yard_per_width",
-                inch: 59,
-                unit: "마",
-                cost: 6000,
-                margin: 50,
-                price: 9000,
-                labor: 5000
-            },
-            {
-                book: "코아",
-                id: "COA-01",
-                name: "도톰 생활암막 베이지 (59\" 인치)",
-                calcType: "yard_per_width",
-                inch: 59,
-                unit: "마",
-                cost: 8000,
-                margin: 50,
-                price: 12000,
-                labor: 5000
-            },
-            {
-                book: "데미안",
-                id: "DAM-01",
-                name: "데미안 암막 (1Y 야드당)",
-                calcType: "yard_per_width",
-                inch: 54,
-                unit: "마",
-                cost: 5000,
-                margin: 60,
-                price: 8000,
-                labor: 5000
-            },
-            {
-                book: "데미안",
-                id: "DAM-02",
-                name: "데미안 암막 (1폭 150cm)",
-                calcType: "width",
-                inch: 59,
-                unit: "폭",
-                cost: 12000,
-                margin: 50,
-                price: 18000,
-                labor: 5000
-            },
-            {
-                book: "삼보텍스",
-                id: "SAM-01",
-                name: "삼보텍스 콤비 블라인드 (헤베당)",
-                calcType: "hebe",
-                inch: 0,
-                unit: "헤베",
-                cost: 10000,
-                margin: 50,
-                price: 15000,
-                labor: 0
-            }
+            { book: "포아", id: "POA-01", name: "차르르 쉬폰 화이트 (59\" 인치)", calcType: "yard_per_width", inch: 59, unit: "마", cost: 6000, margin: 50, price: 9000, labor: 5000 },
+            { book: "코아", id: "COA-01", name: "도톰 생활암막 베이지 (59\" 인치)", calcType: "yard_per_width", inch: 59, unit: "마", cost: 8000, margin: 50, price: 12000, labor: 5000 },
+            { book: "데미안", id: "DAM-01", name: "데미안 암막 (1Y 야드당)", calcType: "yard_per_width", inch: 54, unit: "마", cost: 5000, margin: 60, price: 8000, labor: 5000 },
+            { book: "데미안", id: "DAM-02", name: "데미안 암막 (1폭 150cm)", calcType: "width", inch: 59, unit: "폭", cost: 12000, margin: 50, price: 18000, labor: 5000 },
+            { book: "삼보텍스", id: "SAM-01", name: "삼보텍스 콤비 블라인드 (헤베당)", calcType: "hebe", inch: 0, unit: "헤베", cost: 10000, margin: 50, price: 15000, labor: 0 }
         ];
 
         let FABRIC_DB = [];
@@ -674,9 +544,46 @@
             initDefaultRooms();
             calculateAll();
             setupPwaInstall();
+            // 앱 실행 시 구글 시트에서 최신 단가 자동 동기화
+            fetchGoogleSheetDb(true);
         };
 
-        // PWA Dynamic Web App Manifest Injection
+        // Fetch Google Sheet CSV with cache-busting
+        async function fetchGoogleSheetDb(silent = false) {
+            if (!GOOGLE_SHEET_CSV_URL) return;
+            if (!silent) showToast("구글 시트에서 최신 단가표를 불러오는 중...", "info");
+
+            try {
+                const freshUrl = GOOGLE_SHEET_CSV_URL + '&_t=' + Date.now();
+                const response = await fetch(freshUrl);
+                if (!response.ok) throw new Error("구글 시트 응답 실패");
+                const csvText = await response.text();
+
+                Papa.parse(csvText, {
+                    header: false,
+                    skipEmptyLines: 'greedy',
+                    complete: function(results) {
+                        if (results && results.data && results.data.length > 0) {
+                            parseSheetDataToFabricDb(results.data);
+                            updateDbBadgeText(`구글 시트 연동 (${FABRIC_DB.length}개)`);
+                            if (!silent) {
+                                showToast(`구글 시트 단가표 (${FABRIC_DB.length}개) 동기화 완료!`);
+                            }
+                        } else {
+                            if (!silent) showToast("구글 시트 내용이 비어있습니다.", "info");
+                        }
+                    },
+                    error: function(err) {
+                        console.error(err);
+                        if (!silent) showToast("시트 데이터 파싱 오류", "info");
+                    }
+                });
+            } catch (err) {
+                console.warn("구글 시트 불러오기 실패 (기존 캐시 사용):", err);
+                if (!silent) showToast("구글 시트 연결 실패. 기존에 저장된 단가표를 유지합니다.", "info");
+            }
+        }
+
         function registerAppManifest() {
             const manifest = {
                 name: "Re.dam 커튼 & 블라인드 견적 시스템",
@@ -687,28 +594,17 @@
                 background_color: "#f8fafc",
                 theme_color: "#1e1b4b",
                 icons: [
-                    {
-                        src: "https://placehold.co/192x192/1e1b4b/ffffff.png?text=Re.dam",
-                        sizes: "192x192",
-                        type: "image/png"
-                    },
-                    {
-                        src: "https://placehold.co/512x512/1e1b4b/ffffff.png?text=Re.dam",
-                        sizes: "512x512",
-                        type: "image/png"
-                    }
+                    { src: "https://placehold.co/192x192/1e1b4b/ffffff.png?text=Re.dam", sizes: "192x192", type: "image/png" },
+                    { src: "https://placehold.co/512x512/1e1b4b/ffffff.png?text=Re.dam", sizes: "512x512", type: "image/png" }
                 ]
             };
-            const stringManifest = JSON.stringify(manifest);
-            const blob = new Blob([stringManifest], { type: 'application/manifest+json' });
-            const manifestURL = URL.createObjectURL(blob);
+            const blob = new Blob([JSON.stringify(manifest)], { type: 'application/manifest+json' });
             const link = document.createElement('link');
             link.rel = 'manifest';
-            link.href = manifestURL;
+            link.href = URL.createObjectURL(blob);
             document.head.appendChild(link);
         }
 
-        // PWA Native Install Prompt Handler
         function setupPwaInstall() {
             window.addEventListener('beforeinstallprompt', (e) => {
                 e.preventDefault();
@@ -722,26 +618,17 @@
             if (deferredInstallPrompt) {
                 deferredInstallPrompt.prompt();
                 deferredInstallPrompt.userChoice.then((choiceResult) => {
-                    if (choiceResult.outcome === 'accepted') {
-                        showToast("앱 설치가 진행됩니다!");
-                    }
+                    if (choiceResult.outcome === 'accepted') showToast("앱 설치가 진행됩니다!");
                     deferredInstallPrompt = null;
                 });
             } else {
-                // Show Galaxy Samsung Internet / Chrome manual installation guide
-                document.getElementById('installGuideModal').classList.remove('hidden');
+                showToast("브라우저 메뉴(≡)에서 [홈 화면에 추가] 또는 [앱으로 설치]를 선택하세요.");
             }
-        }
-
-        function closeInstallGuideModal() {
-            document.getElementById('installGuideModal').classList.add('hidden');
         }
 
         function updateDbBadgeText(text) {
             const badge = document.getElementById('dbLoadedBadge');
-            if (badge) {
-                badge.textContent = text;
-            }
+            if (badge) badge.innerHTML = `<i class="fa-solid fa-cloud-check"></i> ${text}`;
         }
 
         function handleCsvFileUpload(event) {
@@ -754,7 +641,7 @@
                 complete: function(results) {
                     if (results && results.data && results.data.length > 0) {
                         parseSheetDataToFabricDb(results.data);
-                        showToast(`'${file.name}' 파일에서 ${FABRIC_DB.length}개 데이터를 성공적으로 불러왔습니다!`);
+                        showToast(`'${file.name}'에서 ${FABRIC_DB.length}개 데이터를 불러왔습니다!`);
                     } else {
                         showToast("CSV 파일 데이터를 읽을 수 없습니다.", "info");
                     }
@@ -784,7 +671,7 @@
             }
 
             if (headerIdx === -1) {
-                showToast("CSV 파일에서 헤더(책자/품명/단가/마진/가공비) 행을 찾지 못했습니다.", "info");
+                showToast("단가표에서 헤더(책자/품명/단가/가공비 등) 행을 찾지 못했습니다.", "info");
                 return;
             }
 
@@ -795,7 +682,6 @@
                 const row = dataRows[i];
                 if (!row || row.length === 0 || !row.some(cell => String(cell).trim() !== '')) continue;
 
-                // Create key-value mapping with normalized header keys
                 const rowMap = {};
                 rawHeaders.forEach((h, colIdx) => {
                     const rawH = String(h || '').trim();
@@ -805,13 +691,10 @@
                     if (!rowMap[normH]) rowMap[normH] = val;
                 });
 
-                // Helper to search across multiple possible column aliases
                 const getCol = (aliases) => {
                     for (const alias of aliases) {
                         const normA = alias.replace(/[\s\/_()%]/g, '').toLowerCase();
-                        if (rowMap[normA] !== undefined && rowMap[normA] !== '') {
-                            return rowMap[normA];
-                        }
+                        if (rowMap[normA] !== undefined && rowMap[normA] !== '') return rowMap[normA];
                     }
                     return '';
                 };
@@ -823,7 +706,6 @@
                 const specRaw = getCol(['규격사이즈', '규격', '사이즈', '폭', '인치', '규격인치', '폭인치']) || "54";
                 const color = getCol(['색상', '컬러', 'color', '색상명']);
 
-                // Financial columns: cost, margin, labor, price
                 const costRaw = getCol(['공급가', '공급단가', '원가', '원단원가', '원단공급가', '매입가', '매입단가', '기본단가', '단가']);
                 const marginRaw = getCol(['마진율', '마진', '마진%', '마진퍼센트', '이익률', '마진금액', 'margin']);
                 const laborRaw = getCol(['가공비', '봉제비', '수공비', '가공단가', '봉제단가', '수공단가', '가공', '원단가공비', '공임', '공임비', '가공비용', 'labor']);
@@ -831,7 +713,6 @@
                 const unitRaw = getCol(['단위', '계산단위']);
 
                 const fullName = color ? `${name} (${color})` : name;
-
                 const bookLower = book.toLowerCase();
                 const nameLower = fullName.toLowerCase();
                 const catLower = category.toLowerCase();
@@ -847,15 +728,6 @@
                 } else if (specLower.includes('1폭') || specLower.includes('폭당') || unitLower.includes('1폭') || unitLower.includes('폭당') || nameLower.includes('1폭') || nameLower.includes('폭당') || catLower.includes('폭당')) {
                     calcType = "width";
                     unit = "폭";
-                } else if (specLower.includes('"') || unitLower.includes('"') || nameLower.includes('"') || 
-                         specLower.includes('인치') || unitLower.includes('인치') || nameLower.includes('인치') ||
-                         specLower.includes('1y') || unitLower.includes('1y') || nameLower.includes('1y') || catLower.includes('1y') ||
-                         specLower.includes('yard') || unitLower.includes('yard') || nameLower.includes('yard') ||
-                         specLower.includes('야드') || unitLower.includes('야드') || nameLower.includes('야드') ||
-                         specLower.includes('마') || unitLower.includes('마') || nameLower.includes('마') ||
-                         /\b1?y\b/i.test(specLower) || /\b1?y\b/i.test(unitLower) || /\b1?y\b/i.test(nameLower) || /\b1?y\b/i.test(catLower)) {
-                    calcType = "yard_per_width";
-                    unit = "마";
                 } else {
                     calcType = "yard_per_width";
                     unit = "마";
@@ -874,19 +746,13 @@
                     const matchInch = String(specRaw).match(/\d+/);
                     if (matchInch) {
                         const val = parseInt(matchInch[0], 10);
-                        if (val <= 10) {
-                            parsedInch = (calcType === "width" || specLower.includes('폭') || nameLower.includes('폭')) ? 59 : 54;
-                        } else {
-                            parsedInch = val;
-                        }
+                        parsedInch = val <= 10 ? ((calcType === "width" || specLower.includes('폭')) ? 59 : 54) : val;
                     } else {
                         parsedInch = (calcType === "width") ? 59 : 54;
                     }
                 }
 
                 const cost = cleanNumber(costRaw);
-
-                // Accurate Margin parsing from CSV
                 let margin = 50;
                 if (marginRaw !== "") {
                     let mVal = parseFloat(String(marginRaw).replace(/%/g, '').replace(/,/g, '').trim());
@@ -896,15 +762,7 @@
                     }
                 }
 
-                // Accurate Fabric Labor (가공비) parsing from CSV
-                let labor = 0;
-                if (laborRaw !== "") {
-                    labor = cleanNumber(laborRaw);
-                } else {
-                    labor = (calcType === "hebe" ? 0 : 5000);
-                }
-
-                // Accurate Selling Price calculation based on CSV Margin or Selling Price column
+                let labor = laborRaw !== "" ? cleanNumber(laborRaw) : (calcType === "hebe" ? 0 : 5000);
                 let price = 0;
                 if (priceRaw !== "" && cleanNumber(priceRaw) > 0) {
                     price = cleanNumber(priceRaw);
@@ -932,11 +790,6 @@
             if (newDb.length > 0) {
                 FABRIC_DB = newDb;
                 saveFabricDb(true);
-                updateDbBadgeText(`CSV 데이터 (${FABRIC_DB.length}개)`);
-                toggleDbSection(true); // CSV 로드 완료 시 펼쳐서 데이터 확인
-            } else {
-                FABRIC_DB = JSON.parse(JSON.stringify(DEFAULT_FABRIC_PRESETS));
-                saveFabricDb(true);
             }
         }
 
@@ -962,7 +815,7 @@
             renderDbTable();
             if (triggerRoomsRender) renderRooms();
             calculateAll();
-            updateDbBadgeText(`DB 품목 (${FABRIC_DB.length}개)`);
+            updateDbBadgeText(`보관 품목 (${FABRIC_DB.length}개)`);
         }
 
         function updateBookFilterOptions() {
@@ -979,10 +832,7 @@
                     opt.textContent = `${b} (${count}개)`;
                     filterSelect.appendChild(opt);
                 });
-
-                if (books.includes(currentVal)) {
-                    filterSelect.value = currentVal;
-                }
+                if (books.includes(currentVal)) filterSelect.value = currentVal;
             }
         }
 
@@ -1001,13 +851,6 @@
                     name: "안방",
                     curtains: [
                         { id: curtainIdCounter++, label: "데미안 암막 (1Y 야드)", width: 280, height: 230, pleat: "2.0", bookFilter: "ALL", fabricId: "DAM-01", hwName: "레일", hwPrice: 1000, shapeFee: 3000 }
-                    ]
-                },
-                {
-                    id: roomIdCounter++,
-                    name: "작은방 / 서재",
-                    curtains: [
-                        { id: curtainIdCounter++, label: "삼보텍스 콤비 블라인드", width: 180, height: 180, pleat: "1.0", bookFilter: "ALL", fabricId: "SAM-01", hwName: "미사용(블라인드)", hwPrice: 0, shapeFee: 0 }
                     ]
                 }
             ];
@@ -1063,18 +906,16 @@
 
             renderRooms();
             calculateAll();
-            showToast(`[${room.name}]에 창/항목이 추가되었습니다.`);
+            showToast(`[${room.name}]에 항목이 추가되었습니다.`);
         }
 
         function removeCurtainFromRoom(roomId, curtainId) {
             const room = rooms.find(r => r.id === roomId);
             if (!room) return;
-
             if (room.curtains.length <= 1) {
                 showToast("공간 당 최소 1개 항목이 존재해야 합니다.", "info");
                 return;
             }
-
             room.curtains = room.curtains.filter(c => c.id !== curtainId);
             renderRooms();
             calculateAll();
@@ -1092,24 +933,19 @@
                 roomCard.className = "bg-white rounded-2xl p-3.5 sm:p-5 md:p-6 shadow-sm border border-slate-200 space-y-3 sm:space-y-4 relative w-full min-w-0";
 
                 let curtainsHtml = "";
-
                 room.curtains.forEach((c, curtainIndex) => {
                     const filteredFabrics = c.bookFilter === "ALL" ? FABRIC_DB : FABRIC_DB.filter(f => f.book === c.bookFilter);
                     let fabricOptionsHtml = "";
 
                     if (filteredFabrics.length === 0) {
-                        fabricOptionsHtml = `<option value="">해당 조건에 제품이 없습니다</option>`;
+                        fabricOptionsHtml = `<option value="">제품 없음</option>`;
                     } else {
                         const groupBooks = [...new Set(filteredFabrics.map(f => f.book))];
                         groupBooks.forEach(b => {
                             fabricOptionsHtml += `<optgroup label="📖 ${b}">`;
                             filteredFabrics.filter(f => f.book === b).forEach(f => {
                                 const selected = (f.id === c.fabricId || f.name === c.fabricId) ? "selected" : "";
-                                let calcBadgeText = "1폭";
-                                if (f.calcType === "yard_per_width") calcBadgeText = "1Y";
-                                if (f.calcType === "hebe") calcBadgeText = "헤베";
-
-                                const specText = f.calcType === "hebe" ? "블라인드" : `${f.inch}"/${(f.inch * 2.54).toFixed(0)}cm`;
+                                let calcBadgeText = f.calcType === "yard_per_width" ? "1Y" : (f.calcType === "hebe" ? "헤베" : "1폭");
                                 fabricOptionsHtml += `<option value="${f.id}" ${selected}>[${calcBadgeText}] ${f.name} - ${(f.price||0).toLocaleString()}원/${f.unit}</option>`;
                             });
                             fabricOptionsHtml += `</optgroup>`;
@@ -1121,7 +957,6 @@
                         curFab = FABRIC_DB[0];
                         c.fabricId = curFab.id;
                     }
-
                     const isBlind = curFab && curFab.calcType === "hebe";
 
                     curtainsHtml += `
@@ -1150,7 +985,7 @@
                                 <div class="min-w-0">
                                     ${isBlind ? `
                                         <label class="block text-[10px] font-bold text-amber-800 mb-0.5 truncate">적용 헤베</label>
-                                        <div class="w-full px-1.5 py-1 border border-amber-300 rounded-lg text-[11px] font-bold bg-amber-100/80 text-amber-900 text-center truncate" title="최저 2.0 헤베 자동적용">
+                                        <div class="w-full px-1.5 py-1 border border-amber-300 rounded-lg text-[11px] font-bold bg-amber-100/80 text-amber-900 text-center truncate">
                                             최저 2.0헤베
                                         </div>
                                     ` : `
@@ -1186,7 +1021,6 @@
                                 </div>
                             </div>
 
-                            <!-- Hardware & Shape-memory Controls (Disabled for Blinds) -->
                             <div class="grid grid-cols-3 gap-1.5 sm:gap-2 pt-1 border-t border-slate-200/60 ${isBlind ? 'opacity-50 pointer-events-none' : ''}">
                                 <div class="min-w-0">
                                     <label class="block text-[10px] font-bold text-slate-500 mb-0.5 truncate">부자재/레일</label>
@@ -1228,11 +1062,7 @@
                             </button>
                         </div>
                     </div>
-
-                    <div class="space-y-2.5 sm:space-y-3">
-                        ${curtainsHtml}
-                    </div>
-
+                    <div class="space-y-2.5 sm:space-y-3">${curtainsHtml}</div>
                     <div class="bg-slate-900 text-white p-3 rounded-xl flex justify-between items-center text-xs shadow-sm">
                         <span class="font-bold flex items-center gap-1 truncate mr-2">🏠 ${room.name} 판매가 합계:</span>
                         <span class="font-black text-amber-400 text-base font-mono whitespace-nowrap flex-shrink-0" id="roomSubtotal_${room.id}">0원</span>
@@ -1257,7 +1087,6 @@
             if (!c) return;
 
             c[key] = val;
-
             if (key === 'bookFilter') {
                 const filtered = val === "ALL" ? FABRIC_DB : FABRIC_DB.filter(f => f.book === val);
                 if (filtered.length > 0) c.fabricId = filtered[0].id;
@@ -1265,14 +1094,12 @@
             } else if (key === 'fabricId') {
                 renderRooms();
             }
-
             calculateAll();
         }
 
         function calculateAll() {
             let grandSubtotal = 0;
             let grandCostTotal = 0;
-
             const globalInstallFee = parseFloat(document.getElementById('globalInstallFee').value) || 0;
             const vatOption = document.getElementById('globalVatOption').value;
 
@@ -1286,112 +1113,59 @@
                 room.curtains.forEach(c => {
                     let fab = FABRIC_DB.find(f => f.id === c.fabricId) || FABRIC_DB.find(f => f.name === c.fabricId);
                     if (!fab) {
-                        fab = FABRIC_DB[0] || {
-                            name: "기본원단", book: "-", calcType: "yard_per_width", inch: 59, unit: "마", cost: 6000, margin: 50, price: 9000, labor: 5000
-                        };
+                        fab = FABRIC_DB[0] || { name: "기본원단", book: "-", calcType: "yard_per_width", inch: 59, unit: "마", cost: 6000, margin: 50, price: 9000, labor: 5000 };
                         c.fabricId = fab.id;
                     }
 
-                    let fabricSellingCost = 0;
-                    let fabricSupplyCost = 0;
-                    let laborCost = 0;
-                    let hwCost = 0;
-                    let qtyText = "";
-                    let numWidths = 0;
-                    let totalYards = 0;
-                    let appliedHebe = 0;
-
+                    let fabricSellingCost = 0, fabricSupplyCost = 0, laborCost = 0, hwCost = 0;
+                    let qtyText = "", numWidths = 0, totalYards = 0, appliedHebe = 0;
                     const numJa = Math.ceil((c.width || 0) / 30);
 
-                    // 1. BLIND (헤베 / m²당 계산 - 최저 2.0 헤베 자동적용)
                     if (fab.calcType === "hebe") {
                         const widthMeters = (c.width || 0) / 100;
                         const heightMeters = (c.height || 0) / 100;
                         const rawHebe = widthMeters * heightMeters;
-
                         appliedHebe = Math.max(2.0, Math.round(rawHebe * 100) / 100);
-
                         fabricSellingCost = Math.round(appliedHebe * (fab.price || 0));
                         fabricSupplyCost = Math.round(appliedHebe * (fab.cost || 0));
-
                         laborCost = Math.round(appliedHebe * (fab.labor || 0));
                         hwCost = 0;
-
                         const isMinApplied = rawHebe < 2.0;
-                        const laborDesc = fab.labor > 0 ? ` / 가공비 ${(fab.labor||0).toLocaleString()}원` : '';
-                        qtyText = `${appliedHebe.toFixed(2)}m² (${appliedHebe}헤베${isMinApplied ? ' [2.0헤베 최저적용]' : ''})${laborDesc}`;
-
+                        qtyText = `${appliedHebe.toFixed(2)}m² (${appliedHebe}헤베${isMinApplied ? ' [2.0최저]' : ''})`;
                     } else if (fab.calcType === "yard_per_width") {
-                        // 2. CURTAIN: 1Y / 인치원단 (야드당 / 마당 계산)
                         const pleatVal = parseFloat(c.pleat) || 2.0;
                         const totalRequiredCurtainWidth = (c.width || 0) * pleatVal;
-
-                        let fabricWidthInches = fab.inch;
-                        if (!fabricWidthInches || fabricWidthInches <= 10) {
-                            fabricWidthInches = 54;
-                        }
+                        let fabricWidthInches = (!fab.inch || fab.inch <= 10) ? 54 : fab.inch;
                         const fabricWidthCm = fabricWidthInches * 2.54;
-
                         numWidths = Math.ceil(totalRequiredCurtainWidth / fabricWidthCm) || 1;
-
                         const yardPerWidth = ((c.height || 0) + 30) / 90;
-                        // 마(야드) 수량을 정수 단위로 올림 처리
                         totalYards = Math.ceil(numWidths * yardPerWidth);
-
                         fabricSellingCost = Math.round(totalYards * (fab.price || 0));
                         fabricSupplyCost = Math.round(totalYards * (fab.cost || 0));
-
-                        const fabLaborTotal = Math.round(totalYards * (fab.labor || 0));
-                        const shapeLaborTotal = numWidths * (c.shapeFee || 0);
-                        laborCost = fabLaborTotal + shapeLaborTotal;
-
+                        laborCost = Math.round(totalYards * (fab.labor || 0)) + (numWidths * (c.shapeFee || 0));
                         hwCost = numJa * (c.hwPrice || 0);
-
-                        qtyText = `${numWidths}폭 x ${yardPerWidth.toFixed(1)}마 = ${totalYards}마(올림) (야드당 ${(fab.price||0).toLocaleString()}원 / 가공비 ${(fab.labor||0).toLocaleString()}원)`;
-
+                        qtyText = `${numWidths}폭 x ${yardPerWidth.toFixed(1)}마 = ${totalYards}마`;
                     } else {
-                        // 3. CURTAIN: 1폭 (150cm 기준 폭당 계산)
                         const pleatVal = parseFloat(c.pleat) || 2.0;
                         const totalRequiredCurtainWidth = (c.width || 0) * pleatVal;
-
-                        let fabricWidthInches = fab.inch;
-                        if (!fabricWidthInches || fabricWidthInches <= 10) {
-                            fabricWidthInches = 59;
-                        }
+                        let fabricWidthInches = (!fab.inch || fab.inch <= 10) ? 59 : fab.inch;
                         const fabricWidthCm = fabricWidthInches * 2.54;
-
-                        // 폭 수 올림 처리
                         numWidths = Math.ceil(totalRequiredCurtainWidth / fabricWidthCm) || 1;
-
                         fabricSellingCost = numWidths * (fab.price || 0);
                         fabricSupplyCost = numWidths * (fab.cost || 0);
-
                         laborCost = numWidths * ((fab.labor || 0) + (c.shapeFee || 0));
                         hwCost = numJa * (c.hwPrice || 0);
-
-                        qtyText = `${numWidths}폭(올림) (1폭 ${(fabricWidthCm).toFixed(0)}cm 기준 / 가공비 ${(fab.labor||0).toLocaleString()}원)`;
+                        qtyText = `${numWidths}폭(올림)`;
                     }
 
-                    // 창문별 판매가 (산출 금액) - 천원 단위 올림(백원 단위 이하 절상)
                     const rawCurtainSubtotal = fabricSellingCost + laborCost + hwCost;
                     const curtainSubtotal = Math.ceil(rawCurtainSubtotal / 1000) * 1000;
                     const curtainCostTotal = fabricSupplyCost + laborCost + hwCost;
 
                     c.calc = {
-                        fabName: fab.name,
-                        fabBook: fab.book,
-                        calcType: fab.calcType,
-                        numWidths: numWidths,
-                        totalYards: totalYards,
-                        appliedHebe: appliedHebe,
-                        qtyText: qtyText,
-                        fabricSellingCost: fabricSellingCost,
-                        fabricSupplyCost: fabricSupplyCost,
-                        laborCost: laborCost,
-                        numJa: numJa,
-                        hwCost: hwCost,
-                        curtainSubtotal: curtainSubtotal,
-                        curtainCostTotal: curtainCostTotal
+                        fabName: fab.name, fabBook: fab.book, calcType: fab.calcType,
+                        numWidths, totalYards, appliedHebe, qtyText,
+                        curtainSubtotal, curtainCostTotal, numJa, laborCost, hwCost
                     };
 
                     roomSubtotalSum += curtainSubtotal;
@@ -1399,7 +1173,6 @@
 
                     const qtyEl = document.getElementById(`curtainQty_${c.id}`);
                     const subEl = document.getElementById(`curtainSub_${c.id}`);
-
                     if (qtyEl) qtyEl.textContent = qtyText;
                     if (subEl) subEl.textContent = `${curtainSubtotal.toLocaleString()}원`;
                 });
@@ -1420,15 +1193,11 @@
                 }
             });
 
-            // 전체 판매가 = 각 방 산출금액 합계 + 전체 시공비 (천원 단위 올림 처리)
             const sellingPrice = Math.ceil((grandSubtotal + globalInstallFee) / 1000) * 1000;
             const finalCostTotalWithInstall = grandCostTotal + globalInstallFee;
-
-            let vatAmount = 0;
-            let finalPrice = 0;
+            let vatAmount = 0, finalPrice = 0;
 
             if (vatOption === 'business') {
-                // 부가세도 백원 단위가 발생하지 않도록 1,000원 단위 올림
                 vatAmount = Math.ceil((sellingPrice * 0.1) / 1000) * 1000;
                 finalPrice = sellingPrice + vatAmount;
                 document.getElementById('badgeVat').textContent = "세금계산서 발행 (VAT 10% 추가)";
@@ -1465,9 +1234,7 @@
             const statusText = document.getElementById('dbAccordionStatus');
             if (!content) return;
 
-            const isHidden = content.classList.contains('hidden');
-            const shouldOpen = forceOpen !== undefined ? forceOpen : isHidden;
-
+            const shouldOpen = forceOpen !== undefined ? forceOpen : content.classList.contains('hidden');
             if (shouldOpen) {
                 content.classList.remove('hidden');
                 if (chevron) chevron.style.transform = 'rotate(180deg)';
@@ -1490,11 +1257,7 @@
             const searchKeyword = document.getElementById('dbSearchInput') ? document.getElementById('dbSearchInput').value.trim().toLowerCase() : "";
 
             let filtered = FABRIC_DB;
-
-            if (selectedBook !== "ALL") {
-                filtered = filtered.filter(f => f.book === selectedBook);
-            }
-
+            if (selectedBook !== "ALL") filtered = filtered.filter(f => f.book === selectedBook);
             if (searchKeyword) {
                 filtered = filtered.filter(f => 
                     (f.name && f.name.toLowerCase().includes(searchKeyword)) ||
@@ -1504,7 +1267,7 @@
             }
 
             if (filtered.length === 0) {
-                tbody.innerHTML = `<tr><td colspan="6" class="p-4 text-center text-slate-400">조건에 일치하는 품목이 없습니다.</td></tr>`;
+                tbody.innerHTML = `<tr><td colspan="6" class="p-4 text-center text-slate-400">등록된 품목이 없습니다.</td></tr>`;
                 return;
             }
 
@@ -1514,10 +1277,10 @@
                 let laborText = `${(f.labor||0).toLocaleString()}원/폭`;
 
                 if (f.calcType === "yard_per_width") {
-                    calcBadge = `<span class="bg-amber-50 text-amber-800 px-1.5 py-0.5 rounded font-bold">1Y(야드당)</span>`;
+                    calcBadge = `<span class="bg-amber-50 text-amber-800 px-1.5 py-0.5 rounded font-bold">1Y</span>`;
                     laborText = `${(f.labor||0).toLocaleString()}원/마`;
                 } else if (f.calcType === "hebe") {
-                    calcBadge = `<span class="bg-emerald-50 text-emerald-800 px-1.5 py-0.5 rounded font-bold">헤베(m²)</span>`;
+                    calcBadge = `<span class="bg-emerald-50 text-emerald-800 px-1.5 py-0.5 rounded font-bold">헤베</span>`;
                     laborText = `${(f.labor||0).toLocaleString()}원`;
                 }
 
@@ -1527,9 +1290,7 @@
                             <div class="text-[10px] text-slate-400 font-normal">${f.book} [${f.id}]</div>
                             <div class="text-slate-800 font-semibold">${f.name}</div>
                         </td>
-                        <td class="p-2.5 font-mono">
-                            ${calcBadge}
-                        </td>
+                        <td class="p-2.5 font-mono">${calcBadge}</td>
                         <td class="p-2.5 font-mono text-slate-500">${(f.cost||0).toLocaleString()}원</td>
                         <td class="p-2.5 font-mono font-bold text-indigo-900">${(f.price||0).toLocaleString()}원/${f.unit||'폭'}</td>
                         <td class="p-2.5 font-mono font-bold text-emerald-700">${laborText}</td>
@@ -1546,7 +1307,6 @@
             showProfit = !showProfit;
             const panel = document.getElementById('profitPanel');
             const btn = document.getElementById('btnToggleProfit');
-
             if (showProfit) {
                 panel.classList.remove('hidden');
                 btn.className = "bg-amber-600 text-white font-bold px-3.5 py-2.5 rounded-xl text-xs transition flex items-center gap-1.5 shadow-sm ring-2 ring-amber-300";
@@ -1585,11 +1345,7 @@
             const inchVal = parseFloat(document.getElementById('modalFabInch').value) || 0;
             const cmVal = (inchVal * 2.54).toFixed(1);
             const previewEl = document.getElementById('modalInchCmPreview');
-            if (inchVal === 0) {
-                previewEl.textContent = "블라인드 규격 (헤베당)";
-            } else {
-                previewEl.textContent = `약 ${cmVal} cm`;
-            }
+            previewEl.textContent = inchVal === 0 ? "블라인드 규격 (헤베당)" : `약 ${cmVal} cm`;
         }
 
         function calcModalSellingPrice(source) {
@@ -1602,18 +1358,14 @@
             let price = parseFloat(priceEl.value) || 0;
 
             if (source === 'cost' || source === 'margin') {
-                const calcPrice = Math.round(cost * (1 + margin / 100));
-                priceEl.value = calcPrice;
-            } else if (source === 'price') {
-                if (cost > 0) {
-                    const calcMargin = Math.round(((price - cost) / cost) * 100);
-                    marginEl.value = calcMargin;
-                }
+                priceEl.value = Math.round(cost * (1 + margin / 100));
+            } else if (source === 'price' && cost > 0) {
+                marginEl.value = Math.round(((price - cost) / cost) * 100);
             }
         }
 
         function openFabricModal() {
-            document.getElementById('modalTitle').textContent = "제품/원단 추가 (직접 입력)";
+            document.getElementById('modalTitle').textContent = "제품/원단 추가";
             document.getElementById('modalFabIndex').value = "-1";
             document.getElementById('modalFabBook').value = "샘플북";
             document.getElementById('modalFabId').value = "FAB-0" + (FABRIC_DB.length + 1);
@@ -1625,7 +1377,6 @@
             document.getElementById('modalFabMargin').value = "50";
             document.getElementById('modalFabPrice').value = "10500";
             document.getElementById('modalFabLabor').value = "5000";
-
             handleCalcTypeChange();
             document.getElementById('fabricModal').classList.remove('hidden');
         }
@@ -1633,8 +1384,7 @@
         function editFabric(index) {
             const f = FABRIC_DB[index];
             if (!f) return;
-
-            document.getElementById('modalTitle').textContent = "제품/원단 정보 수정";
+            document.getElementById('modalTitle').textContent = "제품/원단 수정";
             document.getElementById('modalFabIndex').value = index;
             document.getElementById('modalFabBook').value = f.book;
             document.getElementById('modalFabId').value = f.id;
@@ -1646,7 +1396,6 @@
             document.getElementById('modalFabMargin').value = f.margin || 0;
             document.getElementById('modalFabPrice').value = f.price || 0;
             document.getElementById('modalFabLabor').value = f.labor || 0;
-
             handleCalcTypeChange();
             document.getElementById('fabricModal').classList.remove('hidden');
         }
@@ -1658,7 +1407,6 @@
         function handleFabricSubmit(e) {
             e.preventDefault();
             const index = parseInt(document.getElementById('modalFabIndex').value);
-            
             const fabObj = {
                 book: document.getElementById('modalFabBook').value.trim(),
                 id: document.getElementById('modalFabId').value.trim(),
@@ -1672,23 +1420,18 @@
                 labor: parseFloat(document.getElementById('modalFabLabor').value) || 0
             };
 
-            if (index === -1) {
-                FABRIC_DB.push(fabObj);
-                showToast(`[${fabObj.book}] ${fabObj.name} 품목이 추가되었습니다.`);
-            } else {
-                FABRIC_DB[index] = fabObj;
-                showToast(`품목 정보가 수정되었습니다.`);
-            }
+            if (index === -1) FABRIC_DB.push(fabObj);
+            else FABRIC_DB[index] = fabObj;
 
             saveFabricDb();
             closeFabricModal();
+            showToast("품목 정보가 저장되었습니다.");
         }
 
         function deleteFabric(index) {
             const f = FABRIC_DB[index];
             if (!f) return;
-
-            showCustomConfirm(`'${f.name}' 항목을 정말 삭제하시겠습니까?`, () => {
+            showCustomConfirm(`'${f.name}' 항목을 삭제하시겠습니까?`, () => {
                 FABRIC_DB.splice(index, 1);
                 saveFabricDb();
                 showToast("항목이 삭제되었습니다.");
@@ -1709,7 +1452,6 @@
             const subtotalText = document.getElementById('resGrandSubtotal').textContent;
             const vatText = document.getElementById('resGrandVat').textContent;
 
-            // Date String formatting (YYYY-MM-DD)
             const today = new Date();
             const dateStr = `${today.getFullYear()}-${String(today.getMonth() + 1).padStart(2, '0')}-${String(today.getDate()).padStart(2, '0')}`;
 
@@ -1729,71 +1471,48 @@
                     return `   └ ${c.label}: 가로 ${c.width}cm x 세로 ${c.height}cm (${calc.calcType === "hebe" ? "블라인드" : c.pleat + "배"})\n` +
                            `     - 제품: [${calc.fabBook}] ${calc.fabName}\n` +
                            `     - 산출: ${calc.qtyText}\n` +
-                           `     - 부자재/수공: ${calc.calcType === "hebe" ? "미적용(블라인드)" : (c.hwName + " (" + calc.numJa + "자) / 수공비 포함")}\n` +
+                           `     - 부자재/수공: ${calc.calcType === "hebe" ? "미적용" : (c.hwName + " (" + calc.numJa + "자)")}\n` +
                            `     - 판매가: ${(calc.curtainSubtotal||0).toLocaleString()}원`;
                 }).join('\n');
 
                 const roomSum = r.curtains.reduce((acc, curr) => acc + (curr.calc ? curr.calc.curtainSubtotal : 0), 0);
-
-                return `[${i+1}. ${r.name}] (총 ${r.curtains.length}개 항목)\n` +
-                       `${curtainLines}\n` +
-                       `▶ ${r.name} 판매가 합계: ${roomSum.toLocaleString()}원`;
+                return `[${i+1}. ${r.name}] (총 ${r.curtains.length}개)\n${curtainLines}\n▶ ${r.name} 소계: ${roomSum.toLocaleString()}원`;
             }).join('\n\n');
 
             setTimeout(() => {
                 if (type === 'factory') {
                     if (helpText) helpText.innerHTML = `🏭 <strong>공장 발주서</strong>: 각 공간과 창호별 실측 및 제품 규격이 정리되었습니다.`;
-                    textarea.value = `[공장 통합 발주서]\n` +
-                        `• 일자: ${dateStr}\n` +
-                        `• 현장/고객명: ${custName} 님\n` +
-                        `----------------------------------------\n\n` +
-                        `${roomSummaries}\n\n` +
-                        `----------------------------------------\n` +
-                        `※ 헤베(블라인드) 및 야드(마당) 규격 수량 최종 확인 요망.`;
+                    textarea.value = `[공장 통합 발주서]\n• 일자: ${dateStr}\n• 현장/고객명: ${custName} 님\n----------------------------------------\n\n${roomSummaries}\n\n----------------------------------------\n※ 헤베 및 야드 규격 수량 최종 확인 요망.`;
                 } else if (type === 'kakao') {
-                    if (helpText) helpText.innerHTML = `💬 <strong>카톡 견적 안내문</strong>: 복사 후 고객 카카오톡 채팅창에 바로 전송하실 수 있습니다.`;
-                    const isBusiness = vatOption === 'business';
-                    const vatDesc = isBusiness 
-                        ? `🧾 부가세 (VAT 10%): ${vatText}원 (세금계산서/지출증빙 발행)\n`
-                        : `🧾 부가세: 0원 (일반 소비자 판매가 적용)\n`;
+                    if (helpText) helpText.innerHTML = `💬 <strong>카톡 견적 안내문</strong>: 복사 후 카카오톡으로 바로 전송하실 수 있습니다.`;
+                    const vatDesc = vatOption === 'business' 
+                        ? `🧾 부가세 (VAT 10%): ${vatText}원 (세금계산서 발행)\n`
+                        : `🧾 부가세: 0원 (일반 소비자 판매가)\n`;
 
-                    textarea.value = `안녕하세요 ${custName} 고객님! 요청하신 공간별 커튼 & 블라인드 맞춤 견적 안내드립니다. 😊\n\n` +
-                        `📍 공간 및 창문별 견적 상세:\n\n` +
-                        `${roomSummaries}\n\n` +
+                    textarea.value = `안녕하세요 ${custName} 고객님! 요청하신 커튼 & 블라인드 맞춤 견적 안내드립니다. 😊\n\n` +
+                        `📍 견적 상세 내역:\n\n${roomSummaries}\n\n` +
                         `----------------------------------------\n` +
                         `🚚 전체 시공/출장비: ${globalInstallFee.toLocaleString()}원\n` +
                         `💵 판매가 (시공비 포함): ${subtotalText}원\n` +
                         `${vatDesc}` +
                         `💳 최종 금액: ${totalGrandPriceText}원\n` +
                         `----------------------------------------\n` +
-                        `결제 확인 후 꼼꼼하고 정성스럽게 제작 및 시공해 드리겠습니다. 감사합니다!`;
+                        `감사합니다!`;
                 } else if (type === 'sheet') {
-                    // TSV format: When pasted in Excel or Google Sheets, it cleanly maps to columns and rows
-                    if (helpText) helpText.innerHTML = `📊 <strong>시트 상세(표)</strong>: 복사 버튼 클릭 후 엑셀이나 구글 시트 셀에서 <strong>Ctrl+V</strong> 하시면 표로 바로 붙습니다.`;
-                    const headers = ["일자", "고객명", "공간", "항목구분", "샘플북", "품목명", "가로(cm)", "세로(cm)", "주름/방식", "산출수량", "단위", "단가", "부자재", "가공/형상비", "판매금액"];
+                    if (helpText) helpText.innerHTML = `📊 <strong>시트 상세(표)</strong>: 복사 후 엑셀이나 구글 시트에서 <strong>Ctrl+V</strong> 하시면 표로 붙습니다.`;
+                    const headers = ["일자", "고객명", "공간", "항목", "샘플북", "품목명", "가로", "세로", "방식", "수량", "단위", "단가", "부자재", "가공비", "판매금액"];
                     let rows = [headers.join('\t')];
 
                     rooms.forEach(r => {
                         r.curtains.forEach(c => {
                             const calc = c.calc || {};
                             const fab = FABRIC_DB.find(f => f.id === c.fabricId) || {};
-                            const qtyVal = calc.calcType === 'hebe' 
-                                ? calc.appliedHebe 
-                                : (calc.calcType === 'yard_per_width' ? calc.totalYards : calc.numWidths);
+                            const qtyVal = calc.calcType === 'hebe' ? calc.appliedHebe : (calc.calcType === 'yard_per_width' ? calc.totalYards : calc.numWidths);
 
                             rows.push([
-                                dateStr,
-                                custName,
-                                r.name,
-                                c.label,
-                                calc.fabBook || "",
-                                calc.fabName || "",
-                                c.width,
-                                c.height,
-                                calc.calcType === 'hebe' ? '블라인드' : `${c.pleat}배`,
-                                qtyVal,
-                                fab.unit || "",
-                                fab.price || 0,
+                                dateStr, custName, r.name, c.label, calc.fabBook || "", calc.fabName || "",
+                                c.width, c.height, calc.calcType === 'hebe' ? '블라인드' : `${c.pleat}배`,
+                                qtyVal, fab.unit || "", fab.price || 0,
                                 calc.calcType === 'hebe' ? '미적용' : `${c.hwName} (${calc.numJa}자)`,
                                 calc.calcType === 'hebe' ? 0 : calc.laborCost,
                                 calc.curtainSubtotal || 0
@@ -1801,42 +1520,20 @@
                         });
                     });
 
-                    // Summary Rows
-                    rows.push(["", "", "", "", "", "", "", "", "", "", "", "", "전체 시공/출장비", "", globalInstallFee].join('\t'));
-                    rows.push(["", "", "", "", "", "", "", "", "", "", "", "", "판매가 (시공비 포함)", "", sellingPriceVal].join('\t'));
-                    rows.push(["", "", "", "", "", "", "", "", "", "", "", "", "부가세 (VAT)", "", vatAmountVal].join('\t'));
+                    rows.push(["", "", "", "", "", "", "", "", "", "", "", "", "전체 시공비", "", globalInstallFee].join('\t'));
                     rows.push(["", "", "", "", "", "", "", "", "", "", "", "", "최종 금액", "", finalPriceVal].join('\t'));
-
                     textarea.value = rows.join('\n');
                 } else if (type === 'ledger') {
-                    // CRM 1-Line Entry format: Perfect for maintaining a cumulative customer management ledger sheet
-                    if (helpText) helpText.innerHTML = `📋 <strong>고객대장(1행)</strong>: 복사 후 고객 관리 대장 시트의 빈 행에 <strong>Ctrl+V</strong> 하시면 1행으로 깔끔하게 누적됩니다.`;
-                    const headers = ["일자", "고객명", "공간수", "총 창문수", "대표 품목 요약", "판매가(시공비포함)", "부가세", "최종금액", "시공비", "VAT구분"];
-                    
-                    let firstItemName = "";
-                    let totalCurtains = 0;
-                    rooms.forEach(r => {
-                        r.curtains.forEach(c => {
-                            totalCurtains++;
-                            if (!firstItemName && c.calc && c.calc.fabName) {
-                                firstItemName = c.calc.fabName;
-                            }
-                        });
-                    });
-                    const itemSummary = totalCurtains > 1 ? `${firstItemName} 외 ${totalCurtains - 1}건` : firstItemName;
-                    const vatLabel = vatOption === 'business' ? '세금계산서 발행(10%)' : '일반소비자(기본)';
+                    if (helpText) helpText.innerHTML = `📋 <strong>고객대장(1행)</strong>: 고객 관리 대장 시트의 빈 행에 <strong>Ctrl+V</strong> 하세요.`;
+                    const headers = ["일자", "고객명", "공간수", "창문수", "대표품목", "판매가", "부가세", "최종금액", "시공비", "VAT구분"];
+                    let firstItem = (rooms[0] && rooms[0].curtains[0] && rooms[0].curtains[0].calc) ? rooms[0].curtains[0].calc.fabName : "커튼";
+                    let totalCount = rooms.reduce((acc, curr) => acc + curr.curtains.length, 0);
 
                     const ledgerRow = [
-                        dateStr,
-                        custName,
-                        `${rooms.length}개 공간`,
-                        `${totalCurtains}개 창`,
-                        itemSummary,
-                        sellingPriceVal,
-                        vatAmountVal,
-                        finalPriceVal,
-                        globalInstallFee,
-                        vatLabel
+                        dateStr, custName, `${rooms.length}개`, `${totalCount}개`,
+                        totalCount > 1 ? `${firstItem} 외 ${totalCount-1}건` : firstItem,
+                        sellingPriceVal, vatAmountVal, finalPriceVal, globalInstallFee,
+                        vatOption === 'business' ? '세금계산서' : '일반'
                     ].join('\t');
 
                     textarea.value = `${headers.join('\t')}\n${ledgerRow}`;
@@ -1864,41 +1561,24 @@
             const vatAmount = vatOption === 'business' ? Math.ceil((sellingPrice * 0.1) / 1000) * 1000 : 0;
             const finalPrice = sellingPrice + vatAmount;
 
-            const headers = ["일자", "고객명", "공간", "항목구분", "샘플북", "품목명", "가로(cm)", "세로(cm)", "주름/방식", "산출수량", "단위", "단가", "부자재", "가공/형상비", "판매금액"];
-
+            const headers = ["일자", "고객명", "공간", "항목", "샘플북", "품목명", "가로", "세로", "방식", "수량", "단위", "단가", "부자재", "가공비", "판매금액"];
             const escapeCsv = (val) => {
                 const s = String(val ?? '');
-                if (s.includes(',') || s.includes('"') || s.includes('\n')) {
-                    return `"${s.replace(/"/g, '""')}"`;
-                }
-                return s;
+                return (s.includes(',') || s.includes('"') || s.includes('\n')) ? `"${s.replace(/"/g, '""')}"` : s;
             };
 
-            // UTF-8 BOM to prevent Korean characters from garbling in Excel
-            let csvContent = '\uFEFF';
-            csvContent += headers.map(escapeCsv).join(',') + '\r\n';
+            let csvContent = '\uFEFF' + headers.map(escapeCsv).join(',') + '\r\n';
 
             rooms.forEach(r => {
                 r.curtains.forEach(c => {
                     const calc = c.calc || {};
                     const fab = FABRIC_DB.find(f => f.id === c.fabricId) || {};
-                    const qtyVal = calc.calcType === 'hebe' 
-                        ? calc.appliedHebe 
-                        : (calc.calcType === 'yard_per_width' ? calc.totalYards : calc.numWidths);
+                    const qtyVal = calc.calcType === 'hebe' ? calc.appliedHebe : (calc.calcType === 'yard_per_width' ? calc.totalYards : calc.numWidths);
 
                     const row = [
-                        dateStr,
-                        custName,
-                        r.name,
-                        c.label,
-                        calc.fabBook || "",
-                        calc.fabName || "",
-                        c.width,
-                        c.height,
-                        calc.calcType === 'hebe' ? '블라인드' : `${c.pleat}배`,
-                        qtyVal,
-                        fab.unit || "",
-                        fab.price || 0,
+                        dateStr, custName, r.name, c.label, calc.fabBook || "", calc.fabName || "",
+                        c.width, c.height, calc.calcType === 'hebe' ? '블라인드' : `${c.pleat}배`,
+                        qtyVal, fab.unit || "", fab.price || 0,
                         calc.calcType === 'hebe' ? '미적용' : `${c.hwName} (${calc.numJa}자)`,
                         calc.calcType === 'hebe' ? 0 : calc.laborCost,
                         calc.curtainSubtotal || 0
@@ -1907,22 +1587,19 @@
                 });
             });
 
-            // Summary Totals
-            csvContent += ["", "", "", "", "", "", "", "", "", "", "", "", "전체 시공/출장비", "", globalInstallFee].map(escapeCsv).join(',') + '\r\n';
-            csvContent += ["", "", "", "", "", "", "", "", "", "", "", "", "판매가 (시공비 포함)", "", sellingPrice].map(escapeCsv).join(',') + '\r\n';
-            csvContent += ["", "", "", "", "", "", "", "", "", "", "", "", "부가세 (VAT)", "", vatAmount].map(escapeCsv).join(',') + '\r\n';
+            csvContent += ["", "", "", "", "", "", "", "", "", "", "", "", "전체 시공비", "", globalInstallFee].map(escapeCsv).join(',') + '\r\n';
             csvContent += ["", "", "", "", "", "", "", "", "", "", "", "", "최종 금액", "", finalPrice].map(escapeCsv).join(',') + '\r\n';
 
             const blob = new Blob([csvContent], { type: 'text/csv;charset=utf-8;' });
             const url = URL.createObjectURL(blob);
             const link = document.createElement('a');
             link.href = url;
-            link.setAttribute('download', `${custName}_견적내역_${fileDateStr}.csv`);
+            link.setAttribute('download', `${custName}_견적_${fileDateStr}.csv`);
             document.body.appendChild(link);
             link.click();
             document.body.removeChild(link);
             URL.revokeObjectURL(url);
-            showToast(`'${custName}_견적내역_${fileDateStr}.csv' 파일이 저장되었습니다.`);
+            showToast("CSV 파일이 다운로드되었습니다.");
         }
 
         function copyToClipboard() {
@@ -1933,7 +1610,6 @@
             showToast("클립보드에 복사되었습니다!");
         }
 
-        // --- Aesthetic Ticket Modal & Printing Logic ---
         function openTicketModal() {
             calculateAll();
             const custName = (document.getElementById('custName').value || "고객").trim();
@@ -1949,24 +1625,18 @@
             if (totalEl) totalEl.textContent = grandTotal;
 
             const today = new Date();
-            if (dateEl) {
-                dateEl.textContent = `${today.getFullYear()}.${String(today.getMonth() + 1).padStart(2, '0')}.${String(today.getDate()).padStart(2, '0')} 기준`;
-            }
+            if (dateEl) dateEl.textContent = `${today.getFullYear()}.${String(today.getMonth() + 1).padStart(2, '0')}.${String(today.getDate()).padStart(2, '0')} 기준`;
 
             if (listEl) {
                 listEl.innerHTML = '';
                 rooms.forEach(r => {
                     const roomTotal = r.curtains.reduce((acc, curr) => acc + (curr.calc ? curr.calc.curtainSubtotal : 0), 0);
-                    
-                    // Clean up parentheses for aesthetic display
                     const fabNames = r.curtains.map(c => {
                         const fab = FABRIC_DB.find(f => f.id === c.fabricId) || {};
-                        const rawName = fab.name || c.label;
-                        return rawName.replace(/\(.*?\)/g, '').trim();
+                        return (fab.name || c.label).replace(/\(.*?\)/g, '').trim();
                     });
                     const uniqueNames = [...new Set(fabNames)].slice(0, 2).join(' & ');
 
-                    // Created with generous line-height and no overflow clipping to eliminate Korean glyph cuts
                     const rowDiv = document.createElement('div');
                     rowDiv.className = "flex justify-between items-center gap-2 border-b border-stone-200/50 ticket-item-row";
                     rowDiv.innerHTML = `
@@ -1982,7 +1652,6 @@
                     listEl.appendChild(rowDiv);
                 });
 
-                // Add Install fee line if present
                 if (globalInstallFee > 0) {
                     const installDiv = document.createElement('div');
                     installDiv.className = "flex justify-between items-center gap-2 border-b border-stone-200/50 ticket-item-row text-stone-600";
@@ -1997,7 +1666,6 @@
                     listEl.appendChild(installDiv);
                 }
             }
-
             document.getElementById('ticketModal').classList.remove('hidden');
         }
 
@@ -2012,18 +1680,12 @@
         async function downloadTicketImage() {
             const element = document.getElementById('ticketCaptureArea');
             if (!element) return;
-
             showToast("모바일 최적화 고화질 이미지 생성 중...", "info");
 
             try {
-                // Ensure all web fonts are fully loaded
-                if (document.fonts && document.fonts.ready) {
-                    await document.fonts.ready;
-                }
-
-                // Render high-resolution canvas with mobile scroll and offset compensations
+                if (document.fonts && document.fonts.ready) await document.fonts.ready;
                 const canvas = await html2canvas(element, {
-                    scale: 3, // High-resolution Retina quality
+                    scale: 3,
                     useCORS: true,
                     backgroundColor: null,
                     logging: false,
@@ -2035,43 +1697,37 @@
                 const custName = (document.getElementById('custName').value || "고객").trim();
                 const today = new Date();
                 const dateStr = `${today.getFullYear()}${String(today.getMonth() + 1).padStart(2, '0')}${String(today.getDate()).padStart(2, '0')}`;
-                currentCaptureFilename = `${custName}_맞춤제작견적서_${dateStr}.png`;
+                currentCaptureFilename = `${custName}_맞춤견적서_${dateStr}.png`;
                 currentCapturedDataUrl = canvas.toDataURL('image/png');
 
-                // Convert to Blob for Web Share API or Direct Download
                 canvas.toBlob(async (blob) => {
                     if (!blob) {
                         triggerDirectDownload();
                         return;
                     }
                     currentCapturedBlob = blob;
-
                     const isMobile = /Android|iPhone|iPad|iPod/i.test(navigator.userAgent);
 
-                    // If Mobile device with Web Share API supporting files, trigger native system sheet (KakaoTalk / Save to Photos)
                     if (isMobile && navigator.share && navigator.canShare) {
                         try {
                             const file = new File([blob], currentCaptureFilename, { type: 'image/png' });
                             if (navigator.canShare({ files: [file] })) {
                                 await navigator.share({
                                     title: `${custName} 고객님 맞춤 견적서`,
-                                    text: `${custName} 고객님 맞춤 제작 견적서 카드입니다.`,
+                                    text: `${custName} 고객님 맞춤 제작 견적서입니다.`,
                                     files: [file]
                                 });
-                                showToast("공유가 완료되었습니다.");
+                                showToast("공유 완료!");
                                 return;
                             }
                         } catch (shareErr) {
-                            // User cancelled or unsupported file sharing, proceed to mobile modal fallback
-                            console.debug("Share cancelled or failed, falling back to modal preview", shareErr);
+                            console.debug("Share cancelled", shareErr);
                         }
                     }
 
-                    // On mobile, show the Long-press Save Modal to prevent download failure
                     if (isMobile) {
                         openMobileImageModal(currentCapturedDataUrl);
                     } else {
-                        // Desktop fallback: direct file trigger
                         triggerDirectDownload();
                         showToast("견적서 이미지가 저장되었습니다!");
                     }
@@ -2079,14 +1735,14 @@
 
             } catch (err) {
                 console.error(err);
-                showToast("이미지 생성 중 문제가 발생했습니다.", "info");
+                showToast("이미지 생성 중 오류 발생", "info");
             }
         }
 
         function triggerDirectDownload() {
             if (!currentCapturedDataUrl) return;
             const link = document.createElement('a');
-            link.download = currentCaptureFilename || "맞춤제작견적서.png";
+            link.download = currentCaptureFilename || "맞춤견적서.png";
             link.href = currentCapturedDataUrl;
             document.body.appendChild(link);
             link.click();
@@ -2127,14 +1783,8 @@
                 btnCancel.onclick = null;
             };
 
-            btnOk.onclick = () => {
-                cleanup();
-                if (onConfirm) onConfirm();
-            };
-
-            btnCancel.onclick = () => {
-                cleanup();
-            };
+            btnOk.onclick = () => { cleanup(); if (onConfirm) onConfirm(); };
+            btnCancel.onclick = () => { cleanup(); };
         }
 
         function showToast(msg, type = "success") {
@@ -2144,18 +1794,11 @@
 
             if (toastMsg) toastMsg.textContent = msg;
             if (toastIcon) {
-                if (type === "info") {
-                    toastIcon.className = "fa-solid fa-circle-info text-amber-400";
-                } else {
-                    toastIcon.className = "fa-solid fa-circle-check text-emerald-400";
-                }
+                toastIcon.className = type === "info" ? "fa-solid fa-circle-info text-amber-400" : "fa-solid fa-circle-check text-emerald-400";
             }
-
             if (toast) {
                 toast.classList.remove('hidden');
-                setTimeout(() => {
-                    toast.classList.add('hidden');
-                }, 3000);
+                setTimeout(() => { toast.classList.add('hidden'); }, 3000);
             }
         }
     </script>
