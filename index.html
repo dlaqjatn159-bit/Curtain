@@ -314,9 +314,9 @@
                                     <tr>
                                         <th class="p-2.5">책자 / 품명</th>
                                         <th class="p-2.5">계산 방식</th>
-                                        <th class="p-2.5">원가(공급가)</th>
-                                        <th class="p-2.5">판매단가</th>
-                                        <th class="p-2.5">가공비</th>
+                                        <th class="p-2.5">원단공급가</th>
+                                        <th class="p-2.5">기본가공비</th>
+                                        <th class="p-2.5">소비자판매단가</th>
                                         <th class="p-2.5 text-center">관리</th>
                                     </tr>
                                 </thead>
@@ -371,28 +371,31 @@
                         <span id="modalInchCmPreview" class="text-[10px] text-indigo-600 font-semibold block mt-1">약 150 cm</span>
                     </div>
                 </div>
-                <div class="grid grid-cols-3 gap-3">
+                <div class="grid grid-cols-4 gap-2">
                     <div>
                         <label class="block text-xs font-bold text-slate-600 mb-1">표기 단위</label>
-                        <input type="text" id="modalFabUnit" readonly class="w-full px-3 py-2 border rounded-xl text-xs bg-slate-100 font-bold text-slate-700 outline-none">
+                        <input type="text" id="modalFabUnit" readonly class="w-full px-2.5 py-2 border rounded-xl text-xs bg-slate-100 font-bold text-slate-700 outline-none">
                     </div>
                     <div>
-                        <label class="block text-xs font-bold text-slate-600 mb-1">공급가 (원가)</label>
-                        <input type="number" id="modalFabCost" required min="0" placeholder="7000" class="w-full px-3 py-2 border rounded-xl text-xs outline-none focus:ring-2 focus:ring-indigo-500" oninput="calcModalSellingPrice('cost')">
+                        <label class="block text-xs font-bold text-slate-600 mb-1">원단공급가</label>
+                        <input type="number" id="modalFabCost" required min="0" placeholder="7000" class="w-full px-2.5 py-2 border rounded-xl text-xs outline-none focus:ring-2 focus:ring-indigo-500" oninput="calcModalSellingPrice('cost')">
+                    </div>
+                    <div>
+                        <label class="block text-xs font-bold text-slate-600 mb-1" id="modalLaborLabel">기본가공비</label>
+                        <input type="number" id="modalFabLabor" required min="0" placeholder="5000" class="w-full px-2.5 py-2 border rounded-xl text-xs outline-none focus:ring-2 focus:ring-indigo-500" oninput="calcModalSellingPrice('labor')">
                     </div>
                     <div>
                         <label class="block text-xs font-bold text-slate-600 mb-1">마진율 (%)</label>
-                        <input type="number" id="modalFabMargin" required min="0" step="1" placeholder="50" class="w-full px-3 py-2 border rounded-xl text-xs font-bold text-amber-700 outline-none focus:ring-2 focus:ring-indigo-500" oninput="calcModalSellingPrice('margin')">
+                        <input type="number" id="modalFabMargin" required min="0" step="1" placeholder="50" class="w-full px-2.5 py-2 border rounded-xl text-xs font-bold text-amber-700 outline-none focus:ring-2 focus:ring-indigo-500" oninput="calcModalSellingPrice('margin')">
                     </div>
                 </div>
-                <div class="grid grid-cols-2 gap-3">
-                    <div class="bg-amber-50/70 p-3 rounded-xl border border-amber-200">
-                        <label class="block text-xs font-bold text-amber-900 mb-1">소비자 판매단가 (원)</label>
-                        <input type="number" id="modalFabPrice" required min="0" placeholder="10500" class="w-full px-3 py-1.5 border border-amber-300 rounded-xl text-xs font-black text-indigo-900 bg-white outline-none focus:ring-2 focus:ring-indigo-500" oninput="calcModalSellingPrice('price')">
-                    </div>
-                    <div class="bg-slate-50 p-3 rounded-xl border border-slate-200">
-                        <label class="block text-xs font-bold text-slate-800 mb-1" id="modalLaborLabel">가공비 (폭/마당)</label>
-                        <input type="number" id="modalFabLabor" required min="0" placeholder="5000" class="w-full px-3 py-1.5 border rounded-xl text-xs outline-none focus:ring-2 focus:ring-indigo-500">
+                <div>
+                    <div class="bg-amber-50/80 p-3 rounded-xl border border-amber-200">
+                        <div class="flex justify-between items-center mb-1">
+                            <label class="block text-xs font-bold text-amber-900">소비자 판매단가 (원 / 도매가+마진 포함)</label>
+                            <span class="text-[10px] text-amber-700">도매가 = 공급가 + 가공비</span>
+                        </div>
+                        <input type="number" id="modalFabPrice" required min="0" placeholder="18000" class="w-full px-3 py-2 border border-amber-300 rounded-xl text-sm font-black text-indigo-900 bg-white outline-none focus:ring-2 focus:ring-indigo-500" oninput="calcModalSellingPrice('price')">
                     </div>
                 </div>
                 <div class="pt-3 flex justify-end gap-2">
@@ -523,11 +526,12 @@
         // Google Sheets Published CSV Endpoint
         const GOOGLE_SHEET_CSV_URL = "https://docs.google.com/spreadsheets/d/e/2PACX-1vSuTgDJgwXvk5Xzl5QHLwTNuJf3rHtoGXrCaddxRd17HjBluwVuEwa8_8xXlzeolQ/pub?gid=1550962698&single=true&output=csv";
 
+        // 기본 프리셋 (도매가 = 공급가 + 기본가공비, 마진 적용 판매단가)
         const DEFAULT_FABRIC_PRESETS = [
-            { book: "포아", id: "POA-01", name: "차르르 쉬폰 화이트 (59\" 인치)", calcType: "yard_per_width", inch: 59, unit: "마", cost: 6000, margin: 50, price: 9000, labor: 5000 },
-            { book: "코아", id: "COA-01", name: "도톰 생활암막 베이지 (59\" 인치)", calcType: "yard_per_width", inch: 59, unit: "마", cost: 8000, margin: 50, price: 12000, labor: 5000 },
-            { book: "데미안", id: "DAM-01", name: "데미안 암막 (1Y 야드당)", calcType: "yard_per_width", inch: 54, unit: "마", cost: 5000, margin: 60, price: 8000, labor: 5000 },
-            { book: "데미안", id: "DAM-02", name: "데미안 암막 (1폭 150cm)", calcType: "width", inch: 59, unit: "폭", cost: 12000, margin: 50, price: 18000, labor: 5000 },
+            { book: "포아", id: "POA-01", name: "차르르 쉬폰 화이트 (59\" 인치)", calcType: "yard_per_width", inch: 59, unit: "마", cost: 6000, margin: 50, price: 16500, labor: 5000 },
+            { book: "코아", id: "COA-01", name: "도톰 생활암막 베이지 (59\" 인치)", calcType: "yard_per_width", inch: 59, unit: "마", cost: 8000, margin: 50, price: 19500, labor: 5000 },
+            { book: "데미안", id: "DAM-01", name: "데미안 암막 (1Y 야드당)", calcType: "yard_per_width", inch: 54, unit: "마", cost: 5000, margin: 60, price: 16000, labor: 5000 },
+            { book: "데미안", id: "DAM-02", name: "데미안 암막 (1폭 150cm)", calcType: "width", inch: 59, unit: "폭", cost: 12000, margin: 50, price: 25500, labor: 5000 },
             { book: "삼보텍스", id: "SAM-01", name: "삼보텍스 콤비 블라인드 (헤베당)", calcType: "hebe", inch: 0, unit: "헤베", cost: 10000, margin: 50, price: 15000, labor: 0 }
         ];
 
@@ -753,6 +757,9 @@
                 }
 
                 const cost = cleanNumber(costRaw);
+                let labor = laborRaw !== "" ? cleanNumber(laborRaw) : (calcType === "hebe" ? 0 : 5000);
+                const baseWholesale = cost + labor; // 도매가 = 원단원가 + 가공비
+
                 let margin = 50;
                 if (marginRaw !== "") {
                     let mVal = parseFloat(String(marginRaw).replace(/%/g, '').replace(/,/g, '').trim());
@@ -762,15 +769,14 @@
                     }
                 }
 
-                let labor = laborRaw !== "" ? cleanNumber(laborRaw) : (calcType === "hebe" ? 0 : 5000);
                 let price = 0;
                 if (priceRaw !== "" && cleanNumber(priceRaw) > 0) {
                     price = cleanNumber(priceRaw);
-                    if (marginRaw === "" && cost > 0) {
-                        margin = Math.round(((price - cost) / cost) * 100);
+                    if (marginRaw === "" && baseWholesale > 0) {
+                        margin = Math.round(((price - baseWholesale) / baseWholesale) * 100);
                     }
                 } else {
-                    price = Math.round(cost * (1 + margin / 100));
+                    price = Math.round(baseWholesale * (1 + margin / 100));
                 }
 
                 newDb.push({
@@ -794,7 +800,7 @@
         }
 
         function loadFabricDb() {
-            const saved = localStorage.getItem('curtain_fabric_db_v11');
+            const saved = localStorage.getItem('curtain_fabric_db_v12');
             if (saved) {
                 try {
                     FABRIC_DB = JSON.parse(saved);
@@ -810,7 +816,7 @@
         }
 
         function saveFabricDb(triggerRoomsRender = true) {
-            localStorage.setItem('curtain_fabric_db_v11', JSON.stringify(FABRIC_DB));
+            localStorage.setItem('curtain_fabric_db_v12', JSON.stringify(FABRIC_DB));
             updateBookFilterOptions();
             renderDbTable();
             if (triggerRoomsRender) renderRooms();
@@ -1113,7 +1119,7 @@
                 room.curtains.forEach(c => {
                     let fab = FABRIC_DB.find(f => f.id === c.fabricId) || FABRIC_DB.find(f => f.name === c.fabricId);
                     if (!fab) {
-                        fab = FABRIC_DB[0] || { name: "기본원단", book: "-", calcType: "yard_per_width", inch: 59, unit: "마", cost: 6000, margin: 50, price: 9000, labor: 5000 };
+                        fab = FABRIC_DB[0] || { name: "기본원단", book: "-", calcType: "yard_per_width", inch: 59, unit: "마", cost: 6000, margin: 50, price: 16500, labor: 5000 };
                         c.fabricId = fab.id;
                     }
 
@@ -1158,8 +1164,13 @@
                         qtyText = `${numWidths}폭(올림)`;
                     }
 
-                    const rawCurtainSubtotal = fabricSellingCost + laborCost + hwCost;
+                    // 판매단가(fab.price)에 이미 (원단원가+기본가공비)의 마진이 포함되어 있으므로
+                    // 판매가 합산 시에는 기본가공비를 중복 합산하지 않고 선택 옵션인 형상기억 가공비만 추가
+                    const extraShapeFee = fab.calcType === "hebe" ? 0 : (numWidths * (c.shapeFee || 0));
+                    const rawCurtainSubtotal = fabricSellingCost + extraShapeFee + hwCost;
                     const curtainSubtotal = Math.ceil(rawCurtainSubtotal / 1000) * 1000;
+                    
+                    // 총 지출 원가 = 원단 공급가 + 가공비(기본+형상) + 부자재
                     const curtainCostTotal = fabricSupplyCost + laborCost + hwCost;
 
                     c.calc = {
@@ -1292,8 +1303,8 @@
                         </td>
                         <td class="p-2.5 font-mono">${calcBadge}</td>
                         <td class="p-2.5 font-mono text-slate-500">${(f.cost||0).toLocaleString()}원</td>
+                        <td class="p-2.5 font-mono text-emerald-700">${laborText}</td>
                         <td class="p-2.5 font-mono font-bold text-indigo-900">${(f.price||0).toLocaleString()}원/${f.unit||'폭'}</td>
-                        <td class="p-2.5 font-mono font-bold text-emerald-700">${laborText}</td>
                         <td class="p-2.5 text-center space-x-1">
                             <button onclick="editFabric(${originalIndex})" class="px-1.5 py-0.5 bg-slate-100 hover:bg-slate-200 text-slate-700 rounded text-[10px] font-semibold">수정</button>
                             <button onclick="deleteFabric(${originalIndex})" class="px-1.5 py-0.5 bg-rose-50 hover:bg-rose-100 text-rose-600 rounded text-[10px] font-semibold">삭제</button>
@@ -1331,12 +1342,12 @@
                 unitEl.value = "마";
                 inchEl.disabled = false;
                 if (!inchEl.value || inchEl.value === "0") inchEl.value = "54";
-                if (laborLabelEl) laborLabelEl.textContent = "야드당 가공비 (원/마)";
+                if (laborLabelEl) laborLabelEl.textContent = "기본가공비 (원/마)";
             } else {
                 unitEl.value = "폭";
                 inchEl.disabled = false;
                 if (!inchEl.value || inchEl.value === "0") inchEl.value = "59";
-                if (laborLabelEl) laborLabelEl.textContent = "폭당 가공비 (원/폭)";
+                if (laborLabelEl) laborLabelEl.textContent = "기본가공비 (원/폭)";
             }
             updateInchCmPreview();
         }
@@ -1348,19 +1359,24 @@
             previewEl.textContent = inchVal === 0 ? "블라인드 규격 (헤베당)" : `약 ${cmVal} cm`;
         }
 
+        // 공장 도매가 (원단 공급가 + 가공비) 기준 마진 및 판매단가 계산
         function calcModalSellingPrice(source) {
             const costEl = document.getElementById('modalFabCost');
+            const laborEl = document.getElementById('modalFabLabor');
             const marginEl = document.getElementById('modalFabMargin');
             const priceEl = document.getElementById('modalFabPrice');
 
             let cost = parseFloat(costEl.value) || 0;
+            let labor = parseFloat(laborEl.value) || 0;
             let margin = parseFloat(marginEl.value) || 0;
             let price = parseFloat(priceEl.value) || 0;
 
-            if (source === 'cost' || source === 'margin') {
-                priceEl.value = Math.round(cost * (1 + margin / 100));
-            } else if (source === 'price' && cost > 0) {
-                marginEl.value = Math.round(((price - cost) / cost) * 100);
+            const baseWholesale = cost + labor;
+
+            if (source === 'cost' || source === 'labor' || source === 'margin') {
+                priceEl.value = Math.round(baseWholesale * (1 + margin / 100));
+            } else if (source === 'price' && baseWholesale > 0) {
+                marginEl.value = Math.round(((price - baseWholesale) / baseWholesale) * 100);
             }
         }
 
@@ -1374,9 +1390,9 @@
             document.getElementById('modalFabInch').value = "59";
             document.getElementById('modalFabUnit').value = "폭";
             document.getElementById('modalFabCost').value = "7000";
-            document.getElementById('modalFabMargin').value = "50";
-            document.getElementById('modalFabPrice').value = "10500";
             document.getElementById('modalFabLabor').value = "5000";
+            document.getElementById('modalFabMargin').value = "50";
+            document.getElementById('modalFabPrice').value = "18000";
             handleCalcTypeChange();
             document.getElementById('fabricModal').classList.remove('hidden');
         }
@@ -1393,9 +1409,9 @@
             document.getElementById('modalFabInch').value = f.inch || 59;
             document.getElementById('modalFabUnit').value = f.unit || "폭";
             document.getElementById('modalFabCost').value = f.cost || 0;
+            document.getElementById('modalFabLabor').value = f.labor || 0;
             document.getElementById('modalFabMargin').value = f.margin || 0;
             document.getElementById('modalFabPrice').value = f.price || 0;
-            document.getElementById('modalFabLabor').value = f.labor || 0;
             handleCalcTypeChange();
             document.getElementById('fabricModal').classList.remove('hidden');
         }
@@ -1415,9 +1431,9 @@
                 inch: parseFloat(document.getElementById('modalFabInch').value) || 0,
                 unit: document.getElementById('modalFabUnit').value,
                 cost: parseFloat(document.getElementById('modalFabCost').value) || 0,
+                labor: parseFloat(document.getElementById('modalFabLabor').value) || 0,
                 margin: parseFloat(document.getElementById('modalFabMargin').value) || 0,
-                price: parseFloat(document.getElementById('modalFabPrice').value) || 0,
-                labor: parseFloat(document.getElementById('modalFabLabor').value) || 0
+                price: parseFloat(document.getElementById('modalFabPrice').value) || 0
             };
 
             if (index === -1) FABRIC_DB.push(fabObj);
@@ -1486,7 +1502,7 @@
                 } else if (type === 'kakao') {
                     if (helpText) helpText.innerHTML = `💬 <strong>카톡 견적 안내문</strong>: 복사 후 카카오톡으로 바로 전송하실 수 있습니다.`;
                     const vatDesc = vatOption === 'business' 
-                        ? `🧾 부가세 (VAT 10%): ${vatText}원 (세금계산서 발행)\n`
+                        ? `🧾 부가세 (VAT 10%): ${vatText}원 (세금계산서 발행)\n` 
                         : `🧾 부가세: 0원 (일반 소비자 판매가)\n`;
 
                     textarea.value = `안녕하세요 ${custName} 고객님! 요청하신 커튼 & 블라인드 맞춤 견적 안내드립니다. 😊\n\n` +
